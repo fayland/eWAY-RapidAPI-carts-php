@@ -1,0 +1,48 @@
+1. models/Cart66.php, line 885, added
+
+add_shortcode('checkout_ewayrapid',           array($sc, 'ewayrapidCheckout'));
+
+2. models/Cart66ShortcodeManager.php line 293 added
+
+  public function ewayrapidCheckout($attrs) {
+     if(Cart66Session::get('Cart66Cart')->countItems() > 0) {
+      $gatewayName = Cart66Common::postVal('cart66-gateway-name');
+      if($_SERVER['REQUEST_METHOD'] == 'POST' && $gatewayName != 'Cart66EwayRapid') {
+        return ($gatewayName == "Cart66ManualGateway") ? $this->manualCheckout() : "";
+      }
+
+      if(!Cart66Session::get('Cart66Cart')->hasPayPalSubscriptions()) {
+        require_once(CART66_PATH . "/pro/gateways/Cart66EwayRapid.php");
+
+        if(Cart66Session::get('Cart66Cart')->getGrandTotal() > 0 || Cart66Session::get('Cart66Cart')->hasSpreedlySubscriptions()) {
+          try {
+            $eway = new Cart66EwayRapid();
+            $view = $this->_buildCheckoutView($eway);
+          }
+          catch(Cart66Exception $e) {
+            $exception = Cart66Exception::exceptionMessages($e->getCode(), $e->getMessage());
+            $view = Cart66Common::getView('views/error-messages.php', $exception);
+          }
+          return $view;
+        }
+        elseif(Cart66Session::get('Cart66Cart')->countItems() > 0) {
+          Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Displaying manual checkout instead of Eway Checkout because the cart value is $0.00");
+          return $this->manualCheckout();
+        }
+
+      }
+      else {
+        Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Not rendering Eway checkout form because the cart contains a PayPal subscription");
+      }
+    }
+  }
+
+3. views/check.php, line 10, added
+
+  'Cart66EwayRapid',
+
+4. put
+
+[checkout_ewayrapid]
+
+in the Checkout Page in admin area 'Pages'
