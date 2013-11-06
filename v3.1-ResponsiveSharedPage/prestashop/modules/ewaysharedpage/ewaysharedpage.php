@@ -210,7 +210,7 @@ class Ewaysharedpage extends PaymentModule {
             return $sale;
 	    } else {
 	        $responseurl = $result->SharedPaymentUrl;
-	        print "<meta http-equiv='refresh' content='1;url=$responseurl'><a href='$responseurl'>You're redirected to eWAY site to complete.</a>";
+	        print "<meta http-equiv='refresh' content='1;url=$responseurl'><a href='$responseurl'>You will be redirected to eWAY.</a>";
 	    }
 	}
 
