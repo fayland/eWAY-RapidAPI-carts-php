@@ -2,7 +2,7 @@
 <module>
 	<name>ewaysharedpage</name>
 	<displayName><![CDATA[eWAY Responsive Shared Page]]></displayName>
-	<version><![CDATA[0.1]]></version>
+	<version><![CDATA[3.1]]></version>
 	<description><![CDATA[Accepts payments with eWAY Responsive Shared Page]]></description>
 	<author><![CDATA[]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>
