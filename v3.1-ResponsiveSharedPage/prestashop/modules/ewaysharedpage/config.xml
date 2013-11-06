@@ -4,7 +4,7 @@
 	<displayName><![CDATA[eWAY Responsive Shared Page]]></displayName>
 	<version><![CDATA[3.1]]></version>
 	<description><![CDATA[Accepts payments with eWAY Responsive Shared Page]]></description>
-	<author><![CDATA[]]></author>
+	<author><![CDATA[Fayland Lam]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>
 	<confirmUninstall>Are you sure you want to delete your details?</confirmUninstall>
 	<is_configurable>1</is_configurable>
