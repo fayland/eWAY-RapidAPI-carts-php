@@ -1,13 +1,13 @@
 <?php
-/*
-  $Id$
 
-  Payment module
-
-  Copyright (c) 2012 Eway
-
-  Released under the GNU General Public License
-*/
+/**
+ * ewaysharedpage.php payment module class for eWAY Shared Page
+ *
+ * @package paymentMethod
+ * @copyright Copyright 2013 eWAY
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version 3.1.0
+ */
 
 class ewaysharedpage extends base {
     var $code, $title, $description, $enabled, $auth_code, $transaction_id;
