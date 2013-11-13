@@ -1,13 +1,12 @@
 <?php
-/*
-  $Id$
-
-  Payment module
-
-  Copyright (c) 2012 Eway
-
-  Released under the GNU General Public License
-*/
+/**
+ * eway_rapid.php payment module class for eWAY Transparent Redirect
+ *
+ * @package paymentMethod
+ * @copyright Copyright 2013 eWAY
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version 3.1.0
+ */
 
 class eway_rapid extends base {
     var $code, $title, $description, $enabled, $auth_code, $transaction_id;
@@ -19,13 +18,13 @@ class eway_rapid extends base {
 
       $this->code = 'eway_rapid';
       $this->codeTitle = MODULE_PAYMENT_EWAYRAPID_TEXT_TITLE;
-      $this->codeVersion = '1.3.9';
+      $this->codeVersion = '3.1.0';
       $this->enableDirectPayment = true;
       $this->title = MODULE_PAYMENT_EWAYRAPID_TEXT_TITLE;
 
-      if (MODULE_PAYMENT_EWAYRAPID_STATUS == 'True' && MODULE_PAYMENT_EWAYRAPID_LOGIN == '') {
-        $this->title .=  '<span class="alert"> (Not Configured)</span>';
-      } elseif (MODULE_PAYMENT_EWAYRAPID_MODE == 'Test') {
+      if (MODULE_PAYMENT_EWAYRAPID_STATUS == 'True' && MODULE_PAYMENT_EWAYRAPID_USERNAME== '') {
+        $this->title .= '<span class="alert"> (Not Configured)</span>';
+      } elseif (MODULE_PAYMENT_EWAYRAPID_MODE == 'True') {
         $this->title .= '<span class="alert"> (in Testing mode)</span>';
       }
 
@@ -75,8 +74,7 @@ class eway_rapid extends base {
     }
 
     function selection() {
-        return array('id' => $this->code,
-                     'module' => $this->public_title);
+        return array('id' => $this->code, 'module' => $this->public_title);
     }
 
     function pre_confirmation_check() {
@@ -91,18 +89,21 @@ class eway_rapid extends base {
         global $db, $order, $currencies, $currency;
 
         $amount = number_format($order->info['total'], 2, '.', '') * 100;
-        $transact_url = zen_href_link(FILENAME_CHECKOUT_PROCESS, 'referer=eway', 'SSL', true, false);
+        $transact_url = zen_href_link(FILENAME_CHECKOUT_PROCESS, 'referer=eway_rapid', 'SSL', true, false);
         $customerId = $_SESSION['customer_id'];				// customerId
         $merchantRef = $customerId."-".date("YmdHis");		// merchant reference
 
-        require_once(realpath(dirname(__FILE__).'/eway_rapid/RapidAPI.php'));
-        $username = MODULE_PAYMENT_EWAYRAPID_USERNAME;
-        $password = MODULE_PAYMENT_EWAYRAPID_PASSWORD;
-        $livemode = ( MODULE_PAYMENT_EWAYRAPID_MODE == 'True' ) ? false : true;
-        $eway_service = new RapidAPI($livemode, $username, $password);
+        require_once(realpath(dirname(__FILE__).'/eway_rapid/lib/eWAY/RapidAPI.php'));
+        $__username = MODULE_PAYMENT_EWAYRAPID_USERNAME;
+        $__password = MODULE_PAYMENT_EWAYRAPID_PASSWORD;
+        $__sandbox = ( MODULE_PAYMENT_EWAYRAPID_MODE == 'True' ) ? true : false;
+
+        $eway_params = array();
+        if ($__sandbox) $eway_params['sandbox'] = true;
+        $service = new eWAY\RapidAPI($__username, $__password, $eway_params);
 
         // Create AccessCode Request Object
-        $request = new CreateAccessCodeRequest();
+        $request = new eWAY\CreateAccessCodesSharedRequest();
 
         $request->Customer->Reference = 'zencart';
         $request->Customer->Title = 'Mr.';
@@ -135,9 +136,13 @@ class eway_rapid extends base {
 
         $invoiceDesc = '';
         foreach ($order->products as $product) {
-            $item = new EwayLineItem();
+            $item = new eWAY\LineItem();
             $item->SKU = $product['id'];
             $item->Description = $product['name'];
+            $item->Quantity = $product['qty'];
+            $item->UnitCost = $product['price'];
+            if (isset($product['tax'])) $item->Tax = $product['tax'];
+            $item->Total = $product['final_price'] * $product['qty'];
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $product['name'] . ', ';
         }
@@ -160,23 +165,27 @@ class eway_rapid extends base {
 
         $transact_url = str_replace('&amp;', '&', $transact_url);
         $request->RedirectUrl = $transact_url;
+        $request->CancelUrl   = $transact_url;
         $request->Method = 'ProcessPayment';
+        $request->TransactionType = 'Purchase';
 
-        //Call RapidAPI
-        $result = $eway_service->CreateAccessCode($request);
+        // Call RapidAPI
+        $result = $service->CreateAccessCode($request);
+
+        if (! $result) {
+            return '<font style="font-weight:bold; color:red">API Username/Password is wrong for eWAY configuration.</a>';
+        }
+
+        // Check if any error returns
         if (isset($result->Errors)) {
-            //Get Error Messages from Error Code. Error Code Mappings are in the Config.ini file
+            // Get Error Messages from Error Code. Error Code Mappings are in the Config.ini file
             $ErrorArray = explode(",", $result->Errors);
             $lblError = "";
             foreach ( $ErrorArray as $error ) {
-                if (isset($eway_service->APIConfig[$error]))
-                    $lblError .= $error." ".$eway_service->APIConfig[$error]."<br>";
-                else
-                    $lblError .= $error;
+                $error = $service->getMessage($error);
+                $lblError .= $error . "<br />\n";
             }
-        }
 
-        if (isset($lblError)) {
             $messageStack->add_session('checkout_payment', $lblError, 'error');
             zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL', true, false));
             return false;
@@ -185,78 +194,109 @@ class eway_rapid extends base {
         // close previous form
         $process_button_string = '</form><form action="' . $result->FormActionURL . '" method="post" onsubmit="submitonce();">';
         $this->form_action_url = $result->FormActionURL;
-
         $process_button_string .= zen_draw_hidden_field('EWAY_ACCESSCODE', $result->AccessCode);
-        $process_button_string .= '<label for="eway_rapid-cc-ownerf" class="inputLabelPayment">Cardholder Name:</label><input type="text" name="EWAY_CARDNAME" value="" id="eway_rapid-cc-ownerf" autocomplete="off" /><br class="clearBoth" />' . "\n";
-        $process_button_string .= '<label for="eway_rapid-cc-number" class="inputLabelPayment">Credit Card Number:</label><input type="text" name="EWAY_CARDNUMBER" id="eway_rapid-cc-number" autocomplete="off" /><br class="clearBoth" />' . "\n";
-        $process_button_string .= '
-        <label for="eway_rapid-cc-expires-month" class="inputLabelPayment">Credit Card Expiry Date:</label><select name="EWAY_CARDEXPIRYMONTH" id="eway_rapid-cc-expires-month">
-  <option value="01">January - (01)</option>
-  <option value="02">February - (02)</option>
-  <option value="03">March - (03)</option>
-  <option value="04">April - (04)</option>
-  <option value="05">May - (05)</option>
-  <option value="06">June - (06)</option>
-  <option value="07">July - (07)</option>
-  <option value="08">August - (08)</option>
-  <option value="09">September - (09)</option>
-  <option value="10">October - (10)</option>
-  <option value="11">November - (11)</option>
-  <option value="12">December - (12)</option>
-</select>
-&nbsp;<select name="EWAY_CARDEXPIRYYEAR" id="eway_rapid-cc-expires-year">
-  <option value="13">2013</option>
-  <option value="14">2014</option>
-  <option value="15">2015</option>
-  <option value="16">2016</option>
-  <option value="17">2017</option>
-  <option value="18">2018</option>
-  <option value="19">2019</option>
-  <option value="20">2020</option>
-</select>
-<br class="clearBoth" />
-        ';
-        $process_button_string .= '<label for="eway_rapid-cc-cvv" class="inputLabelPayment">CVV</label><input type="text" name="EWAY_CARDCVN" size="4" maxlength="4" id="eway_rapid-cc-cvv" autocomplete="off" /><br class="clearBoth" />';
+
+        $payment_type = MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE;
+        if ($payment_type == 'paypal' || $payment_type == 'masterpass' || $payment_type == 'vme') {
+            $process_button_string .= zen_draw_hidden_field('EWAY_PAYMENTTYPE', $payment_type);
+        } else {
+            $cc_string = '
+            <label for="eway_rapid-cc-ownerf" class="inputLabelPayment">Cardholder Name:</label><input type="text" name="EWAY_CARDNAME" value="" id="eway_rapid-cc-ownerf" autocomplete="off" /><br class="clearBoth" />
+            <label for="eway_rapid-cc-number" class="inputLabelPayment">Credit Card Number:</label><input type="text" name="EWAY_CARDNUMBER" id="eway_rapid-cc-number" autocomplete="off" /><br class="clearBoth" />
+            <label for="eway_rapid-cc-expires-month" class="inputLabelPayment">Credit Card Expiry Date:</label>
+            <select name="EWAY_CARDEXPIRYMONTH" id="eway_rapid-cc-expires-month">
+              <option value="01">January - (01)</option>
+              <option value="02">February - (02)</option>
+              <option value="03">March - (03)</option>
+              <option value="04">April - (04)</option>
+              <option value="05">May - (05)</option>
+              <option value="06">June - (06)</option>
+              <option value="07">July - (07)</option>
+              <option value="08">August - (08)</option>
+              <option value="09">September - (09)</option>
+              <option value="10">October - (10)</option>
+              <option value="11">November - (11)</option>
+              <option value="12">December - (12)</option>
+            </select>
+            &nbsp;<select name="EWAY_CARDEXPIRYYEAR" id="eway_rapid-cc-expires-year">
+              <option value="13">2013</option>
+              <option value="14">2014</option>
+              <option value="15">2015</option>
+              <option value="16">2016</option>
+              <option value="17">2017</option>
+              <option value="18">2018</option>
+              <option value="19">2019</option>
+              <option value="20">2020</option>
+            </select>
+            <br class="clearBoth" />
+            <label for="eway_rapid-cc-cvv" class="inputLabelPayment">CVV</label><input type="text" name="EWAY_CARDCVN" size="4" maxlength="4" id="eway_rapid-cc-cvv" autocomplete="off" /><br class="clearBoth" />
+            ';
+            if ($payment_type == 'creditcard') {
+                $process_button_string .= $cc_string;
+            } else {
+                // USER_PICK
+                $process_button_string .= '
+                <label for="eway_rapid-cc-expires-month" class="inputLabelPayment">Select Payment Option:</label>
+                <select name="EWAY_PAYMENTTYPE" onchange="javascript:ChoosePaymentOption(this.options[this.options.selectedIndex].value)">
+                  <option value="creditcard">Credit Card</option>
+                  <option value="paypal">PayPal</option>
+                  <option value="masterpass">MasterPass</option>
+                  <option value="vme">V.me By Visa</option>
+                </select>
+                <br class="clearBoth" />
+                <script>
+                function ChoosePaymentOption(v) {
+                    if (v != "creditcard") {
+                        document.getElementById("creditcard_info").style.display = "none";
+                    } else {
+                        document.getElementById("creditcard_info").style.display = "block";
+                    }
+                }
+                </script>
+                <div id="creditcard_info">
+                ' . $cc_string . '</div>';
+
+            }
+        }
 
         return $process_button_string;
     }
 
     function before_process() {
-         global $order, $order_totals, $db, $messageStack;
-        if (isset($_GET['referer']) && $_GET['referer'] == 'eway') {
-            require_once(realpath(dirname(__FILE__).'/eway_rapid/RapidAPI.php'));
-            $username = MODULE_PAYMENT_EWAYRAPID_USERNAME;
-            $password = MODULE_PAYMENT_EWAYRAPID_PASSWORD;
-            $livemode = ( MODULE_PAYMENT_EWAYRAPID_MODE == 'True' ) ? false : true;
-            $eway_service = new RapidAPI($livemode, $username, $password);
+        global $order, $order_totals, $db, $messageStack;
+        if ( (isset($_GET['referer']) && $_GET['referer'] == 'eway_rapid') || (isset($_GET['amp;referer']) && $_GET['amp;referer'] == 'eway_rapid') ) {
+            require_once(realpath(dirname(__FILE__).'/eway_rapid/lib/eWAY/RapidAPI.php'));
+            $__username = MODULE_PAYMENT_EWAYRAPID_USERNAME;
+            $__password = MODULE_PAYMENT_EWAYRAPID_PASSWORD;
+            $__sandbox = ( MODULE_PAYMENT_EWAYRAPID_MODE == 'True' ) ? true : false;
 
-            $isError = false;
-            $request = new GetAccessCodeResultRequest();
+            $eway_params = array();
+            if ($__sandbox) $eway_params['sandbox'] = true;
+            $service = new eWAY\RapidAPI($__username, $__password, $eway_params);
+
+            $request = new eWAY\GetAccessCodeResultRequest();
             if ( isset($_GET['amp;AccessCode']) ) {
                 $request->AccessCode = $_GET['amp;AccessCode'];
             } else {
                 $request->AccessCode = $_GET['AccessCode'];
             }
+            $result = $service->GetAccessCodeResult($request);
 
-            //Call RapidAPI to get the result
-            $result = $eway_service->GetAccessCodeResult($request);
-
+            $isError = false;
             // Check if any error returns
-            if(isset($result->Errors)) {
-                // Get Error Messages from Error Code. Error Code Mappings are in the Config.ini file
+            if (isset($result->Errors)) {
                 $ErrorArray = explode(",", $result->Errors);
                 $lblError = "";
                 $isError = true;
                 foreach ( $ErrorArray as $error ) {
-                    $error = trim($error);
-                    $lblError .= $eway_service->APIConfig[$error]."<br>";
+                    $error = $service->getMessage($error);
+                    $lblError .= $error . "<br />\n";
                 }
             }
-
             if (! $isError) {
                 if (! $result->TransactionStatus) {
-                    $lblError = "Payment Declined - " . $result->ResponseCode;
                     $isError = true;
+                    $lblError = "Payment Declined - " . $result->ResponseCode;
                 }
             }
 
@@ -296,18 +336,18 @@ class eway_rapid extends base {
     }
 
     function get_error() {
-        $error = array('title' => MODULE_PAYMENT_LINKPOINT_API_TEXT_ERROR,
+        $error = array('title' => 'Error!',
                        'error' => stripslashes(urldecode($_GET['error'])));
         return $error;
     }
 
     function check() {
-      global $db;
-      if (!isset($this->_check)) {
-        $check_query = $db->Execute("select configuration_value from " . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_PAYMENT_EWAYRAPID_STATUS'");
-        $this->_check = !$check_query->EOF;
-      }
-      return $this->_check;
+        global $db;
+        if (!isset($this->_check)) {
+            $check_query = $db->Execute("select configuration_value from " . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_PAYMENT_EWAYRAPID_STATUS'");
+            $this->_check = !$check_query->EOF;
+        }
+        return $this->_check;
     }
 
     function install() {
@@ -321,6 +361,8 @@ class eway_rapid extends base {
 
 		$db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('eWay Password', 'MODULE_PAYMENT_EWAYRAPID_PASSWORD', '', 'Your eWAY password registered when you join eWAY.', '6', '0', now())");
 
+        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('eWAY Payment Type', 'MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE', 'USER_PICK', 'The type of payment you are processing (new). USER_PICK will show options to customer.', '6', '0', 'zen_cfg_select_option(array(\'USER_PICK\', \'creditcard\', \'paypal\', \'masterpass\', \'vme\'), ', now())");
+
 		$db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value', '6', '0', 'zen_cfg_pull_down_order_statuses(', 'zen_get_order_status_name', now())");
 
 		$db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_EWAYRAPID_SORT_ORDER', '1', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
@@ -332,7 +374,7 @@ class eway_rapid extends base {
     }
 
     function keys() {
-      return array('MODULE_PAYMENT_EWAYRAPID_STATUS', 'MODULE_PAYMENT_EWAYRAPID_MODE', 'MODULE_PAYMENT_EWAYRAPID_USERNAME', 'MODULE_PAYMENT_EWAYRAPID_PASSWORD', 'MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID', 'MODULE_PAYMENT_EWAYRAPID_SORT_ORDER');
+      return array('MODULE_PAYMENT_EWAYRAPID_STATUS', 'MODULE_PAYMENT_EWAYRAPID_MODE', 'MODULE_PAYMENT_EWAYRAPID_USERNAME', 'MODULE_PAYMENT_EWAYRAPID_PASSWORD', 'MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE', 'MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID', 'MODULE_PAYMENT_EWAYRAPID_SORT_ORDER');
     }
 
 }
