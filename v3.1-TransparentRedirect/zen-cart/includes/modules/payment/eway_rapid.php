@@ -236,7 +236,7 @@ class eway_rapid extends base {
             } else {
                 // USER_PICK
                 $process_button_string .= '
-                <label for="eway_rapid-cc-expires-month" class="inputLabelPayment">Select Payment Option:</label>
+                <label class="inputLabelPayment">Select Payment Option:</label>
                 <select name="EWAY_PAYMENTTYPE" onchange="javascript:ChoosePaymentOption(this.options[this.options.selectedIndex].value)">
                   <option value="creditcard">Credit Card</option>
                   <option value="paypal">PayPal</option>

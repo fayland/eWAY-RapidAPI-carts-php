@@ -49,7 +49,7 @@ class Ewaysharedpage extends PaymentModule {
 
 		$data['sandbox'] = isset($_POST['sandbox']) ? $_POST['sandbox'] : isset($conf['EWAY_SANDBOX']) ? $conf['EWAY_SANDBOX'] : 0;
 		$data['username'] = isset($_POST['username']) ? $_POST['username'] : isset($conf['EWAY_USERNAME']) ? $conf['EWAY_USERNAME'] : '';
-		$data['password'] = isset($_POST['password']) ? $_POST['username'] : isset($conf['EWAY_PASSWORD']) ? $conf['EWAY_PASSWORD'] : '';
+		$data['password'] = isset($_POST['password']) ? $_POST['password'] : isset($conf['EWAY_PASSWORD']) ? $conf['EWAY_PASSWORD'] : '';
 		$data['logourl'] = isset($_POST['logourl']) ? $_POST['logourl'] : isset($conf['EWAY_LOGOURL']) ? $conf['EWAY_LOGOURL'] : '';
 		$data['headertext'] = isset($_POST['headertext']) ? $_POST['headertext'] : isset($conf['EWAY_HEADERTEXT']) ? $conf['EWAY_HEADERTEXT'] : '';
 

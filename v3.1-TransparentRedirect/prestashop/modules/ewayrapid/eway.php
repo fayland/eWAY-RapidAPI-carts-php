@@ -9,11 +9,7 @@ if (!$cookie->isLogged())
 	Tools::redirect('index.php?controller=authentication&back=order.php');
 
 $Ewayrapid = new Ewayrapid();
-if( isset($_REQUEST['AccessCode']) ) {
-	$response = $Ewayrapid->GetAccessCodeResult();
-} else {
-    $response = $Ewayrapid->CreateAccessCode();
-}
+$response = $Ewayrapid->GetAccessCodeResult();
 
 include_once(dirname(__FILE__).'/../../footer.php');
 
