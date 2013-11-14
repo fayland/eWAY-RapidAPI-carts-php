@@ -4,6 +4,7 @@ namespace eWAY;
 /* check examples for usage */
 class RapidAPI {
     private $_url;
+    private $sandbox;
     private $username;
     private $password;
 
@@ -17,8 +18,10 @@ class RapidAPI {
 
         if (count($params) && isset($params['sandbox']) && $params['sandbox']) {
             $this->_url = 'https://api.sandbox.ewaypayments.com/';
+            $this->sandbox = true;
         } else {
             $this->_url = 'https://api.ewaypayments.com/';
+            $this->sandbox = false;
         }
     }
 
@@ -126,6 +129,7 @@ class RapidAPI {
         //curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)");
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // curl_setopt($ch, CURLOPT_VERBOSE, true);
         $response = curl_exec($ch);
 
         if (curl_errno($ch) != CURLE_OK) {
@@ -133,8 +137,9 @@ class RapidAPI {
             die();
         } else {
             $info = curl_getinfo($ch);
-            if ($info['http_code'] == 401) {
-                echo "<h2>Please check the API Key and Password</h2><pre>";
+            if ($info['http_code'] == 401 || $info['http_code'] == 404) {
+                $__is_in_sandbox = $this->sandbox ? ' (Sandbox)' : ' (Live)';
+                echo "<h2>Please check the API Key and Password $__is_in_sandbox</h2><pre>";
                 die();
             }
 
