@@ -8,7 +8,6 @@ if (!$cookie->isLogged())
 	Tools::redirect('index.php?controller=authentication&back=order.php');
 
 $Ewayshared = new Ewaysharedpage();
-
 if( isset($_REQUEST['AccessCode']) ) {
 	$response = $Ewayshared->GetAccessCodeResult();
 } else {
