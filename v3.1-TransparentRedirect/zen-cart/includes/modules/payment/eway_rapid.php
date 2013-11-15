@@ -192,7 +192,7 @@ class eway_rapid extends base {
         }
 
         // close previous form
-        $process_button_string = '</form><form action="' . $result->FormActionURL . '" method="post" onsubmit="submitonce();">';
+        $process_button_string = '</form><form action="' . $result->FormActionURL . '" method="post" onsubmit="submiteWAYonce();">';
         $this->form_action_url = $result->FormActionURL;
         $process_button_string .= zen_draw_hidden_field('EWAY_ACCESSCODE', $result->AccessCode);
 
@@ -251,6 +251,12 @@ class eway_rapid extends base {
                     } else {
                         document.getElementById("creditcard_info").style.display = "block";
                     }
+                }
+                function submiteWAYonce() {
+                  var button = document.getElementById("btn_submit");
+                  button.style.cursor="wait";
+                  button.disabled = true;
+                  return false;
                 }
                 </script>
                 <div id="creditcard_info">
