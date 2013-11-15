@@ -198,7 +198,11 @@ class ewaysharedpage extends base {
             return false;
         } else {
             $responseurl = $result->SharedPaymentUrl;
-            return "<meta http-equiv='refresh' content='1;url=$responseurl'><a href='$responseurl'>You will be redirected to eWAY.</a>";
+            return "
+                <meta http-equiv='refresh' content='1;url=$responseurl'>
+                <a href='$responseurl'>You will be redirected to eWAY, if not, please click here.</a>
+                </form><form action='$responseurl' onsubmit='return false;'>
+            ";
         }
     }
 
