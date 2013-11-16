@@ -65,7 +65,6 @@ class ControllerPaymentEway extends Controller {
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $product['name'] . ', ';
         }
-
         $invoiceDesc = substr($invoiceDesc, 0, -2);
         if(strlen($invoiceDesc) > 64) $invoiceDesc = substr($invoiceDesc , 0 , 61) . '...';
 
