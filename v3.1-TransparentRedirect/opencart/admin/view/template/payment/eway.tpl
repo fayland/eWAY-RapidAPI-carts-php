@@ -71,6 +71,7 @@
           <td><?php echo $entry_payment_type; ?></td>
           <td><select name="eway_payment_type">
               <option value="USER_PICK">User Pick</option>
+              <option value="creditcard"<?php if ($eway_payment_type == 'creditcard') { echo " selected='selected'"; } ?>>Credit Card</option>
               <option value="paypal"<?php if ($eway_payment_type == 'paypal') { echo " selected='selected'"; } ?>>PayPal</option>
               <option value="masterpass"<?php if ($eway_payment_type == 'masterpass') { echo " selected='selected'"; } ?>>MasterPass</option>
               <option value="vme"<?php if ($eway_payment_type == 'vme') { echo " selected='selected'"; } ?>>V.me By Visa</option>

@@ -44,8 +44,8 @@
             }
         }
         </script>
-        <div id="creditcard_info">
         {/if}
+<div id="creditcard_info">
 <table class="std">
     <tr>
 		<td>Credit Card Holder</td>
@@ -73,7 +73,7 @@
 		<td><input type="text" class="text" name="EWAY_CARDCVN" id="EWAY_CARDCVN" /></td>
 	</tr>
 </table>
-        {if $payment_type != 'creditcard'}</div>{/if}
+</div>
 
     {/if}
 <table class="std">
