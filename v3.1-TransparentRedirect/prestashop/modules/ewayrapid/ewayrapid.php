@@ -192,7 +192,6 @@ class Ewayrapid extends PaymentModule {
             return $sale;
 	    }
 
-	    error_log(print_r($request, true) . print_r($result, true));
         $years = Tools::dateYears();
         $months = Tools::dateMonths();
         $smarty = $this->context->smarty;
