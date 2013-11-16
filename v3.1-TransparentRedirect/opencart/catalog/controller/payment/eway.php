@@ -74,11 +74,11 @@ class ControllerPaymentEway extends Controller {
         $opt1->Value = $this->session->data['order_id'];
         $request->Options->Option[0]= $opt1;
 
-        $request->Payment->TotalAmount = 200; # number_format($amount, 2, '.', '') * 100;
+        $request->Payment->TotalAmount = number_format($amount, 2, '.', '') * 100;
         $request->Payment->InvoiceNumber = $this->session->data['order_id'];
         $request->Payment->InvoiceDescription = $invoiceDesc;
         $request->Payment->InvoiceReference = $this->config->get('config_name') . ' - #' . $order_info['order_id'];
-        $request->Payment->CurrencyCode = 'AUD'; // $order_info['currency_code']; # FIXME
+        $request->Payment->CurrencyCode = $order_info['currency_code'];
 
         $request->RedirectUrl = $this->url->link('payment/eway/callback', '', 'SSL');
         $request->CancelUrl   = $this->url->link('checkout/checkout', '', 'SSL');
@@ -136,8 +136,8 @@ class ControllerPaymentEway extends Controller {
                 $request->AccessCode = $this->request->get['AccessCode'];
             }
 
-            //Call RapidAPI to get the result
-            $result = $eway_service->GetAccessCodeResult($request);
+            // Call RapidAPI to get the result
+            $result = $service->GetAccessCodeResult($request);
 
             $isError = false;
             // Check if any error returns
@@ -199,7 +199,7 @@ class ControllerPaymentEway extends Controller {
 
                 $this->response->setOutput($this->render());
             } else {
-                $order_id = $result->Options->Option[0]->Value;
+                $order_id = $result->Options[0]->Value;
                 $this->load->model('checkout/order');
                 $order_info = $this->model_checkout_order->getOrder($order_id);
                 $this->model_checkout_order->confirm($order_id, $this->config->get('eway_order_status_id'));

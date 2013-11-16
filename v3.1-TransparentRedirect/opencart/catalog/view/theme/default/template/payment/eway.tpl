@@ -34,7 +34,7 @@
   <?php } ?>
 
     <?php if ($payment_type == 'paypal' || $payment_type == 'masterpass' || $payment_type == 'vme') { ?>
-    <input type='hidden' name='EWAY_PAYMENTTYPE' value='{$payment_type}' />
+    <input type='hidden' name='EWAY_PAYMENTTYPE' value='<?php echo $payment_type ?>' />
     <?php } else { ?>
 
     <?php if ($payment_type != 'creditcard') { ?>
