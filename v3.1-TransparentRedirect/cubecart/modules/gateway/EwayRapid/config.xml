@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<installer version="1.0">
+  <info>
+	<uid>rapidapi@eway.com.au</uid>
+	<type>gateway</type>
+	<name><![CDATA[EwayRapid]]></name>
+	<description><![CDATA[eWAY Payments]]></description>
+	<version>3.1.0</version>
+	<minVersion>5.0.0a</minVersion>
+	<maxVersion>5.1.*</maxVersion>
+	<creator><![CDATA[Fayland Lam]]></creator>
+	<homepage><![CDATA[http://www.eway.com.au]]></homepage>
+	<block>false</block>
+  </info>
+</installer>
