@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions version="1.0">
+ <group name="EwaySharedpage">
+  <string name="module_title"><![CDATA[eWAY]]></string>
+  <string name="module_subtitle"><![CDATA[Online payments made easy!]]></string>
+  <string name="settings"><![CDATA[eWAY Settings]]></string>
+  <string name="username"><![CDATA[eWAY API Key]]></string>
+  <string name="password"><![CDATA[eWAY Password]]></string>
+ </group>
+</definitions>
