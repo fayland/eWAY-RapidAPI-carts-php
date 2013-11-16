@@ -1,42 +1,42 @@
 <?php
 class Gateway {
-	private $_module;
-	private $_basket;
+    private $_module;
+    private $_basket;
 
-	public function __construct($module = false, $basket = false) {
-		$this->_session	=& $GLOBALS['user'];
+    public function __construct($module = false, $basket = false) {
+        $this->_session =& $GLOBALS['user'];
 
-		$this->_module	= $module;
-		$this->_basket =& $GLOBALS['cart']->basket;
-	}
+        $this->_module  = $module;
+        $this->_basket =& $GLOBALS['cart']->basket;
+    }
 
-	public function transfer() {
-		$transfer	= array(
-			'method'	=> 'post',
-			'target'	=> '_self',
-			'submit'	=> 'manual',
-		);
-		return $transfer;
-	}
+    public function transfer() {
+        $transfer   = array(
+            'method'    => 'post',
+            'target'    => '_self',
+            'submit'    => 'manual',
+        );
+        return $transfer;
+    }
 
-	public function repeatVariables() {
-		return false;
-	}
-
-	public function fixedVariables() {
+    public function repeatVariables() {
         return false;
-	}
+    }
 
-	##################################################
+    public function fixedVariables() {
+        return false;
+    }
 
-	public function call() {
-		return false;
-	}
+    ##################################################
 
-	public function process() {
-	    if (isset($_GET['AccessCode'])) {
+    public function call() {
+        return false;
+    }
 
-	        require_once(realpath(dirname(__FILE__).'/lib/eWAY/RapidAPI.php'));
+    public function process() {
+        if (isset($_GET['AccessCode'])) {
+
+            require_once(realpath(dirname(__FILE__).'/lib/eWAY/RapidAPI.php'));
 
             $__username = $this->_module['eway_username'];
             $__password = $this->_module['eway_password'];
@@ -69,19 +69,19 @@ class Gateway {
             }
 
             $cart_order_id = $result->Options[0]->Value;
-            $order		   = Order::getInstance();
+            $order         = Order::getInstance();
             $order_summary = $order->getSummary($cart_order_id);
 
-            $transData['customer_id'] 	= $order_summary["customer_id"];
-            $transData['gateway'] 		= "eWAY";
-            $transData['amount'] 		= sprintf("%.2f", $result->TotalAmount / 100);
+            $transData['customer_id']   = $order_summary["customer_id"];
+            $transData['gateway']       = "eWAY";
+            $transData['amount']        = sprintf("%.2f", $result->TotalAmount / 100);
 
             if ($isError) {
-                $transData['status'] 	= "Failed";
-                $transData['notes'] 	= "Payment unsuccessful. $lblError";
+                $transData['status']    = "Failed";
+                $transData['notes']     = "Payment unsuccessful. $lblError";
             } else {
-                $transData['status'] 	= "Success";
-                $transData['notes'] 	= "Payment was successful.";
+                $transData['status']    = "Success";
+                $transData['notes']     = "Payment was successful.";
                 $transData['trans_id']  = $result->TransactionID;
                 $order->orderStatus(Order::ORDER_PROCESS, $cart_order_id);
                 $order->paymentStatus(Order::PAYMENT_SUCCESS, $cart_order_id);
@@ -90,47 +90,50 @@ class Gateway {
 
             if ($isError) {
                 $GLOBALS['gui']->setError($lblError);
-			    httpredir(currentPage(array('_g', 'type', 'cmd', 'module'), array('_a' => 'confirm')));
-		    }
+                // httpredir(currentPage(array('_g', 'type', 'cmd', 'module'), array('_a' => 'confirm')));
+                httpredir(str_replace('modules/gateway/EwayRapid/','',$GLOBALS['storeURL'].'/index.php?_a=confirm'), '', 200);
+            }
         }
 
-		httpredir(currentPage(array('_g', 'type', 'cmd', 'module'), array('_a' => 'complete')));
-	}
+        // do not contain AccessCode again
+        // httpredir(currentPage(array('_g', 'type', 'cmd', 'module'), array('_a' => 'complete')));
+        httpredir(str_replace('modules/gateway/EwayRapid/','',$GLOBALS['storeURL'].'/index.php?_a=complete'), '', 200);
+    }
 
     private function formatMonth($val) {
-		return $val." - ".strftime("%b", mktime(0,0,0,$val,1 ,2009));
-	}
+        return $val." - ".strftime("%b", mktime(0,0,0,$val,1 ,2009));
+    }
 
-	public function form() {
-		## Show Expire Months
-		$selectedMonth	= (isset($_POST['expirationMonth'])) ? $_POST['expirationMonth'] : date('m');
-		for ($i=1;$i<=12;$i++) {
-			$val = sprintf('%02d',$i);
-			$smarty_data['card']['expire']['months'][]	= array(
-				'selected'	=> ($val == $selectedMonth) ? 'selected="selected"' : '',
-				'value'		=> $val,
-				'display'	=> $this->formatMonth($val),
-			);
-		}
+    public function form() {
+        ## Show Expire Months
+        $selectedMonth  = (isset($_POST['expirationMonth'])) ? $_POST['expirationMonth'] : date('m');
+        for ($i=1;$i<=12;$i++) {
+            $val = sprintf('%02d',$i);
+            $smarty_data['card']['expire']['months'][]  = array(
+                'selected'  => ($val == $selectedMonth) ? 'selected="selected"' : '',
+                'value'     => $val,
+                'display'   => $this->formatMonth($val),
+            );
+        }
 
-		## Show Expire Years
-		$thisYear = date("Y");
-		$maxYear = $thisYear + 10;
-		$selectedYear = isset($_POST['expirationYear']) ? $_POST['expirationYear'] : ($thisYear+2);
-		for($i=$thisYear;$i<=$maxYear;$i++) {
-			$smarty_data['card']['expire']['years'][]	= array(
-				'selected'	=> ($i == $selecetdYear) ? 'selected="selected"' : '',
-				'value'		=> str_pad(substr($i,-2), 2, '0', STR_PAD_LEFT),
-				'display'	=> $i,
-			);
-		}
-		$GLOBALS['smarty']->assign('CARD', $smarty_data['card']);
+        ## Show Expire Years
+        $thisYear = date("Y");
+        $maxYear = $thisYear + 10;
+        $selectedYear = isset($_POST['expirationYear']) ? $_POST['expirationYear'] : ($thisYear+2);
+        for($i=$thisYear;$i<=$maxYear;$i++) {
+            $smarty_data['card']['expire']['years'][]   = array(
+                'selected'  => ($i == $selecetdYear) ? 'selected="selected"' : '',
+                'value'     => str_pad(substr($i,-2), 2, '0', STR_PAD_LEFT),
+                'display'   => $i,
+            );
+        }
+        $GLOBALS['smarty']->assign('CARD', $smarty_data['card']);
 
 //        error_reporting(E_ALL);
 //        ini_set("display_errors", 1);
 
-		$url = $GLOBALS['storeURL'] . '/modules/gateway/EwayRapid/return.php';
-		$amount = $this->_basket['total'];
+        $url = $GLOBALS['storeURL'] . '/modules/gateway/EwayRapid/return.php';
+        $amount = $this->_basket['total'];
 
         require_once(realpath(dirname(__FILE__).'/lib/eWAY/RapidAPI.php'));
 
@@ -142,10 +145,10 @@ class Gateway {
         $addr1 = isset($_POST['addr1']) ? $_POST['addr1'] : $this->_basket['billing_address']['line1'];
         $addr2 = isset($_POST['addr2']) ? $_POST['addr2'] : $this->_basket['billing_address']['line2'];
         $city = isset($_POST['city']) ? $_POST['city'] : $this->_basket['billing_address']['town'];
-		$state = isset($_POST['state']) ? $_POST['state'] : $this->_basket['billing_address']['state'];
-		$postcode = isset($_POST['postcode']) ? $_POST['postcode'] : $this->_basket['billing_address']['postcode'];
-		$countrycode = isset($_POST['country']) ? $_POST['country'] : $this->_basket['billing_address']['country_iso'];
-		$cemail = isset($_POST['emailAddress']) ? $_POST['emailAddress'] : $this->_basket['billing_address']['email'];
+        $state = isset($_POST['state']) ? $_POST['state'] : $this->_basket['billing_address']['state'];
+        $postcode = isset($_POST['postcode']) ? $_POST['postcode'] : $this->_basket['billing_address']['postcode'];
+        $countrycode = isset($_POST['country']) ? $_POST['country'] : $this->_basket['billing_address']['country_iso'];
+        $cemail = isset($_POST['emailAddress']) ? $_POST['emailAddress'] : $this->_basket['billing_address']['email'];
 
         $request->Customer->Reference = 'cubecart';
         // Mr., Ms., Mrs., Miss, Dr., Sir., Prof.
@@ -182,11 +185,13 @@ class Gateway {
 
         $invoiceDesc = '';
         foreach ($this->_basket['contents'] as $key => $product) {
-            error_log(print_r($product, true));
-
             $item = new eWAY\LineItem();
             $item->SKU = $product['product_id'];
             $item->Description = $product['name'];
+            $item->Quantity = $product['quantity'];
+            $item->UnitCost = $product['price'];
+            if (isset($product['tax_each'])) $item->Tax = $product['tax_each'];
+            $item->Total = $product['total_price_each'];
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $product['name'] . ', ';
         }
@@ -235,12 +240,12 @@ class Gateway {
             $GLOBALS['smarty']->assign('FormActionURL', $result->FormActionURL);
         }
 
-		## Check for custom template for module in skin folder
-		$file_name = 'form.tpl';
-		$form_file = $GLOBALS['gui']->getCustomModuleSkin('gateway', dirname(__FILE__), $file_name);
-		$GLOBALS['gui']->changeTemplateDir($form_file);
-		$ret = $GLOBALS['smarty']->fetch($file_name);
-		$GLOBALS['gui']->changeTemplateDir();
-		return $ret;
-	}
+        ## Check for custom template for module in skin folder
+        $file_name = 'form.tpl';
+        $form_file = $GLOBALS['gui']->getCustomModuleSkin('gateway', dirname(__FILE__), $file_name);
+        $GLOBALS['gui']->changeTemplateDir($form_file);
+        $ret = $GLOBALS['smarty']->fetch($file_name);
+        $GLOBALS['gui']->changeTemplateDir();
+        return $ret;
+    }
 }
