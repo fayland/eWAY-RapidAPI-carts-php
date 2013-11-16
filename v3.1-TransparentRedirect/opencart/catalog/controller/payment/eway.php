@@ -56,7 +56,6 @@ class ControllerPaymentEway extends Controller {
         $invoiceDesc = '';
         $products = $this->cart->getProducts();
         foreach ($products as $product) {
-            error_log(print_r($product, true));
             $item = new eWAY\LineItem();
             $item->SKU = $product['product_id'];
             $item->Description = $product['name'];
