@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE install SYSTEM "http://dev.joomla.org/xml/1.5/module-install.dtd">
+<install method="upgrade" type="component" version="1.5.0">
+    <name>VirtueMart_payment_eway</name>
+    <creationDate>Sep 2012</creationDate>
+    <author>eWAY</author>
+    <authorUrl>http://http://www.eway.com.au</authorUrl>
+    <copyright>Copyright (C) 2012 eWAY All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+    <version status="final">2.0.0</version>
+
+    <!-- Custom un/installer for 1.6 -->
+    <scriptfile>script.vmeway.php</scriptfile>
+	<!-- Custom installer for 1.5 -->
+	<installfile>script.vmeway.php</installfile>
+	<!-- Custom uninstaller for 1.5 -->
+	<uninstallfile>script.vmeway.php</uninstallfile>
+
+    <administration>
+	 <menu>VirtueMart eWAY Rapid Payment</menu>
+        <files folder="admin">
+            <filename>admin.virtuemart_payment_eway.php</filename>
+			<folder>administrator</folder>
+            <folder>plugins</folder>
+        </files>
+    </administration>
+
+</install>
