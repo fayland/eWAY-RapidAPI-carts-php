@@ -36,7 +36,7 @@
     <param name="eway_payment_type" type="radio" default="1" label="VMPAYMENT_EWAY_PAYMENTTYPE" description="VMPAYMENT_EWAY_PAYMENTTYPE_DESC" >
 	    <option value="USER_PICK">User Pick</option>
 	    <option value="creditcard">Credit Card</option>
-	    <opiton value="paypal">PayPal</option>
+	    <option value="paypal">PayPal</option>
 	    <option value="masterpass">MasterPass</option>
 	    <option value="vme">V.me By Visa</option>
 	</param>
