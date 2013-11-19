@@ -33,7 +33,7 @@
     <param type="text" name="eway_password" size="50" label="VMPAYMENT_EWAY_PASSWORD"
              default="" description="VMPAYMENT_EWAY_PASSWORD_DESC" />
 
-    <param name="payment_type" type="radio" default="1" label="VMPAYMENT_EWAY_PAYMENTTYPE" description="VMPAYMENT_EWAY_PAYMENTTYPE_DESC" >
+    <param name="eway_payment_type" type="radio" default="1" label="VMPAYMENT_EWAY_PAYMENTTYPE" description="VMPAYMENT_EWAY_PAYMENTTYPE_DESC" >
 	    <option value="USER_PICK">User Pick</option>
 	    <option value="creditcard">Credit Card</option>
 	    <opiton value="paypal">PayPal</option>
