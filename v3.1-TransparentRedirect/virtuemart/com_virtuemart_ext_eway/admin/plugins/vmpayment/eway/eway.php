@@ -227,9 +227,10 @@ class plgVMPaymentEway extends vmPSPlugin {
                 $html .= "<input type='hidden' name='EWAY_PAYMENTTYPE' value='$payment_type' />";
             } else {
                 $cc_string = '
-                <label for="eway_rapid-cc-ownerf" class="inputLabelPayment">' . JText::_ ('VMPAYMENT_EWAY_HOLDER') . '</label><input type="text" name="EWAY_CARDNAME" value="" id="eway_rapid-cc-ownerf" autocomplete="off" /><br class="clearBoth" />
-                <label for="eway_rapid-cc-number" class="inputLabelPayment">' . JText::_ ('VMPAYMENT_EWAY_CCNUM') . '</label><input type="text" name="EWAY_CARDNUMBER" id="eway_rapid-cc-number" autocomplete="off" /><br class="clearBoth" />
-                <label for="eway_rapid-cc-expires-month" class="inputLabelPayment">' . JText::_ ('VMPAYMENT_EWAY_EXDATE') . '</label>';
+                <table class="adminForm user-details">
+                <tr><td class="key"><label for="eway_rapid-cc-ownerf" class="inputLabelPayment">' . JText::_ ('VMPAYMENT_EWAY_HOLDER') . '</label></td><td><input type="text" name="EWAY_CARDNAME" value="" id="eway_rapid-cc-ownerf" autocomplete="off" /></td></tr>
+                <tr><td class="key"><label for="eway_rapid-cc-number" class="inputLabelPayment">' . JText::_ ('VMPAYMENT_EWAY_CCNUM') . '</label></td><td><input type="text" name="EWAY_CARDNUMBER" id="eway_rapid-cc-number" autocomplete="off" /></td></tr>
+                <tr><td class="key"><label for="eway_rapid-cc-expires-month" class="inputLabelPayment">' . JText::_ ('VMPAYMENT_EWAY_EXDATE') . '</label></td><td>';
                 $cc_string .= shopfunctions::listMonths('EWAY_CARDEXPIRYMONTH');
                 $cc_string .= " / ";
                 $options = array();
@@ -240,22 +241,27 @@ class plgVMPaymentEway extends vmPSPlugin {
                 }
                 $cc_string .= JHTML::_('select.genericlist', $options, 'EWAY_CARDEXPIRYYEAR', '', 'value', 'text');
                 $cc_string .= '
-                <br class="clearBoth" />
-                <label for="eway_rapid-cc-cvv" class="inputLabelPayment">' . JText::_ ('VMPAYMENT_EWAY_CVV2') . '</label><input type="text" name="EWAY_CARDCVN" size="4" maxlength="4" id="eway_rapid-cc-cvv" autocomplete="off" /><br class="clearBoth" />
+                </td></tr>
+                <tr><td class="key">
+                <label for="eway_rapid-cc-cvv" class="inputLabelPayment">' . JText::_ ('VMPAYMENT_EWAY_CVV2') . '</label></td><td><input type="text" name="EWAY_CARDCVN" size="4" maxlength="4" id="eway_rapid-cc-cvv" autocomplete="off" /></td></tr></table>
                 ';
                 if ($payment_type == 'creditcard') {
                     $html .= $cc_string;
                 } else {
                     // USER_PICK
                     $html .= '
+                    <table class="adminForm user-details">
+                    <tr><td class="key">
                     <label class="inputLabelPayment">Select Payment Option:</label>
+                    </td><td>
                     <select name="EWAY_PAYMENTTYPE" onchange="javascript:ChoosePaymentOption(this.options[this.options.selectedIndex].value)">
                       <option value="creditcard">Credit Card</option>
                       <option value="paypal">PayPal</option>
                       <option value="masterpass">MasterPass</option>
                       <option value="vme">V.me By Visa</option>
                     </select>
-                    <br class="clearBoth" />
+                    </td></tr>
+                    </table>
                     <script>
                     function ChoosePaymentOption(v) {
                         if (v != "creditcard") {
@@ -271,8 +277,9 @@ class plgVMPaymentEway extends vmPSPlugin {
                 }
             }
 
-            $html .= "<p><input type='submit' value='Process with Eway' /></p>";
-            $html .= '</form>';
+            $html .= '<table class="adminForm user-details"><tr><td class="key">';
+            $html .= "<input type='submit' value='Process with Eway' />";
+            $html .= '</td></tr></table></form>';
         }
 
         //  2 = don't delete the cart, don't send email and don't redirect
