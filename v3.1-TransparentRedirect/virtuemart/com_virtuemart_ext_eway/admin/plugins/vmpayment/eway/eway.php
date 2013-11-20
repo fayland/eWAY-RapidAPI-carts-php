@@ -81,7 +81,6 @@ class plgVMPaymentEway extends vmPSPlugin {
         $new_status = '';
 
         $address = $order['details']['BT'];
-        $shipping_address = $order['details']['ST'];
 
         if (!class_exists('TableVendors'))
             require(JPATH_VM_ADMINISTRATOR . DS . 'table' . DS . 'vendors.php');
@@ -143,7 +142,8 @@ class plgVMPaymentEway extends vmPSPlugin {
         $request->Customer->Phone = $address->phone_1;
         $request->Customer->Mobile = $address->phone_2;
 
-        if (isset($shipping_address)) {
+        if (isset($order['details']['ST'])) {
+            $shipping_address = $order['details']['ST'];
             $request->ShippingAddress->FirstName = strval($shipping_address->first_name);
             $request->ShippingAddress->LastName  = strval($shipping_address->last_name);
             $request->ShippingAddress->Street1 = strval($shipping_address->address_1);
@@ -159,10 +159,13 @@ class plgVMPaymentEway extends vmPSPlugin {
 
         $invoiceDesc = '';
         foreach($order['items'] as $_item) {
-            error_log(print_r($_item, true));
             $item = new eWAY\LineItem();
             $item->SKU = $_item->virtuemart_order_item_id;
             $item->Description = $_item->order_item_name;
+            $item->Quantity = $_item->product_quantity;
+            $item->UnitCost = $_item->product_item_price;
+            $item->Tax = $_item->product_tax;
+            $item->Total = $_item->product_subtotal_with_tax;
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $_item->order_item_name . ', ';
         }
