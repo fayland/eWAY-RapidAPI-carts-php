@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<install version="1.5" type="plugin" group="vmpayment" >
+    <name>VMPAYMENT_EWAYSHAREDPAGE</name>
+    <creationDate>Nov 2013</creationDate>
+    <author>Fayland Lam</author>
+    <authorUrl>http://www.fayland.me/</authorUrl>
+    <copyright>Copyright (C) 2013 Fayland Lam All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+    <version>2.0.9</version>
+    <description><![CDATA[<a href="https://www.eway.com.au/" target="_blank">eWAY</a> is a popular payment provider and available in many countries. ]]>
+    </description>
+
+    <files>
+		<filename plugin="ewaysharedpage">ewaysharedpage.php</filename>
+    </files>
+    <languages>
+	<language tag="en-GB">en-GB.plg_vmpayment_ewaysharedpage.ini</language>
+    </languages>
+    <params addpath="/administrator/components/com_virtuemart/elements">
+	<param type="vmjpluginwarning" />
+
+	<param type="spacer" default="VMPAYMENT_EWAYSHAREDPAGE_SANDBOX_PARAMS" level="level1" />
+
+	<param name="sandbox" type="radio" default="1" label="VMPAYMENT_EWAYSHAREDPAGE_SANDBOX" description="VMPAYMENT_EWAYSHAREDPAGE_SANDBOX_DESC" >
+	    <option value="0">COM_VIRTUEMART_NO</option>
+	    <option value="1">COM_VIRTUEMART_YES</option>
+	</param>
+
+	<param type="spacer" default="VMPAYMENT_EWAYSHAREDPAGE_PARAMS" level="level1" />
+
+    <param type="text" name="ewaysharedpage_username" size="120" label="VMPAYMENT_EWAYSHAREDPAGE_USERNAME"
+             default="" description="VMPAYMENT_EWAYSHAREDPAGE_USERNAME_DESC" />
+    <param type="text" name="ewaysharedpage_password" size="50" label="VMPAYMENT_EWAYSHAREDPAGE_PASSWORD"
+             default="" description="VMPAYMENT_EWAYSHAREDPAGE_PASSWORD_DESC" />
+    <param type="text" name="ewaysharedpage_headertext" size="50" label="Header Text"
+             default="" description="header text shown in the shared page" />
+    <param type="text" name="ewaysharedpage_logourl" size="50" label="Logo URL"
+             default="" description="logo shown in the shared page" />
+
+    <!-- BY DEFAULT EWAY currency= vendor currency -->
+	<param name="payment_currency" type="vmacceptedcurrency" default="" label="VMPAYMENT_EWAYSHAREDPAGE_CURRENCY" description="VMPAYMENT_EWAYSHAREDPAGE_CURRENCY_DESC" />
+
+	<param type="spacer" default="VMPAYMENT_EWAYSHAREDPAGE_VIRTUEMART_PARAMS" level="level1" />
+	<param name="payment_logos" type="vmfiles" label="VMPAYMENT_EWAYSHAREDPAGE_LOGOS"
+             	description="VMPAYMENT_EWAYSHAREDPAGE_LOGOS_DESC"
+             	directory="/images/stories/virtuemart/payment"
+             	default="default" hide_default="1" hide_none="1"
+             	stripext="0"  exclude="^_" />
+	<param name="debug" type="radio" default="0" label="VMPAYMENT_EWAYSHAREDPAGE_DEBUG" description="VMPAYMENT_EWAYSHAREDPAGE_DEBUG_DESC" >
+	    <option value="0">COM_VIRTUEMART_NO</option>
+	    <option value="1">COM_VIRTUEMART_YES</option>
+	</param>
+	<param name="status_pending" type="vmorderstate" scope="com_virtuemart" default="P" label="VMPAYMENT_EWAYSHAREDPAGE_STATUS_PENDING" description="VMPAYMENT_EWAYSHAREDPAGE_STATUS_PENDING_EXPLAIN" />
+	<param name="status_success" type="vmorderstate" scope="com_virtuemart" default="C" label="VMPAYMENT_EWAYSHAREDPAGE_STATUS_SUCCESS" description="VMPAYMENT_EWAYSHAREDPAGE_STATUS_SUCCESS_EXPLAIN" />
+	<param name="status_canceled" type="vmorderstate" scope="com_virtuemart" default="X" label="VMPAYMENT_EWAYSHAREDPAGE_STATUS_FAILED" description="VMPAYMENT_EWAYSHAREDPAGE_STATUS_FAILED_EXPLAIN" />
+	<param name="countries" type="vmcountries"  scope="com_virtuemart" default="" label="VMPAYMENT_EWAYSHAREDPAGE_COUNTRIES" description="VMPAYMENT_EWAYSHAREDPAGE_COUNTRIES_DESC"/>
+	<param name="min_amount" type="text"  label="VMPAYMENT_EWAYSHAREDPAGE_MIN_AMOUNT" description="VMPAYMENT_EWAYSHAREDPAGE_MIN_AMOUNT_EXPLAIN" />
+	<param name="max_amount" type="text"  label="VMPAYMENT_EWAYSHAREDPAGE_MAX_AMOUNT" description="VMPAYMENT_EWAYSHAREDPAGE_MAX_AMOUNT_EXPLAIN" />
+	<param name="cost_per_transaction" type="text"  label="VMPAYMENT_EWAYSHAREDPAGE_COST_PER_TRANSACTION" description="VMPAYMENT_EWAYSHAREDPAGE_COST_PER_TRANSACTION_EXPLAIN" />
+	<param name="cost_percent_total" type="text"  label="VMPAYMENT_EWAYSHAREDPAGE_COST_PERCENT_TOTAL" description="VMPAYMENT_EWAYSHAREDPAGE_COST_PERCENT_TOTAL_EXPLAIN" />
+	<param name="tax_id" type="vmtaxes" scope="com_virtuemart"  label="VMPAYMENT_EWAYSHAREDPAGE_TAX" description="VMPAYMENT_EWAYSHAREDPAGE_TAX_EXPLAIN" />
+    </params>
+
+</install>
