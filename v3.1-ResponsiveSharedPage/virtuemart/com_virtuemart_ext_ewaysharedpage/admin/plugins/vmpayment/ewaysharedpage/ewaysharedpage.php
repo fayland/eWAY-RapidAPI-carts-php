@@ -161,7 +161,7 @@ class plgVMPaymentEwaysharedpage extends vmPSPlugin {
         $invoiceDesc = '';
         foreach($order['items'] as $_item) {
             $item = new eWAY\LineItem();
-            $item->SKU = $_item->virtuemart_order_item_id;
+            $item->SKU = $_item->order_item_sku;
             $item->Description = $_item->order_item_name;
             $item->Quantity = $_item->product_quantity;
             $item->UnitCost = $_item->product_item_price;
