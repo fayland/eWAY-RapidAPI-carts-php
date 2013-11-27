@@ -1,135 +1,345 @@
 <?php
-namespace eWAY;
 
-/* check examples for usage */
+/**
+ * Description of RapidAPI
+ *
+ * @author eWAY
+ */
 class RapidAPI {
-    private $_url;
-    private $sandbox;
-    private $username;
-    private $password;
 
-    function __construct($username, $password, $params=array()) {
-        if (strlen($username) === 0 || strlen($password) === 0) {
-            die("Username and Password are required");
+    var $APIConfig;
+
+    function __construct($live_mode=false, $user=null, $pass=null) {
+        //Load the configuration
+        $APIConfig = parse_ini_file("config.ini");
+        if ($live_mode) {
+            $APIConfig['PaymentService.Soap'] = 'https://api.ewaypayments.com/soap.asmx?WSDL';
+            $APIConfig['PaymentService.POST.CreateAccessCode'] = 'https://api.ewaypayments.com/CreateAccessCode.xml';
+            $APIConfig['PaymentService.POST.GetAccessCodeResult'] = 'https://api.ewaypayments.com/GetAccessCodeResult.xml';
+            $APIConfig['PaymentService.REST'] = 'https://api.ewaypayments.com/AccessCode';
+            $APIConfig['PaymentService.RPC'] = 'https://api.ewaypayments.com/json-rpc';
+            $APIConfig['PaymentService.JSONPScript'] = 'https://api.ewaypayments.com/JSONP/v1/js';
         }
-
-        $this->username = $username;
-        $this->password = $password;
-
-        if (count($params) && isset($params['sandbox']) && $params['sandbox']) {
-            $this->_url = 'https://api.sandbox.ewaypayments.com/';
-            $this->sandbox = true;
-        } else {
-            $this->_url = 'https://api.ewaypayments.com/';
-            $this->sandbox = false;
-        }
+        if (isset($user) && strlen($user)) $APIConfig['Payment.Username'] = $user;
+        if (isset($pass) && strlen($pass)) $APIConfig['Payment.Password'] = $pass;
+        $this->APIConfig = $APIConfig;
     }
 
+    /**
+     * Description: Create Access Code
+     * @param CreateAccessCodeRequest $request
+     * @return StdClass An PHP Ojbect
+     */
     public function CreateAccessCode($request) {
-        if ( isset($request->Options) && count($request->Options->Option) ) {
-            $i = 0;
-            $tempClass = new \stdClass();
-            foreach ($request->Options->Option as $Option) {
-                $tempClass->Options[$i] = $Option;
-                $i++;
-            }
-            $request->Options = $tempClass->Options;
-        }
-        if ( isset($request->Items) && count($request->Items->LineItem) ) {
-            $i = 0;
-            $tempClass = new \stdClass();
-            foreach ($request->Items->LineItem as $LineItem) {
-                // must be strings
-                $LineItem->Quantity = strval($LineItem->Quantity);
-                $LineItem->UnitCost = strval($LineItem->UnitCost);
-                $LineItem->Tax = strval($LineItem->Tax);
-                $LineItem->Total = strval($LineItem->Total);
-                $tempClass->Items[$i] = $LineItem;
-                $i++;
-            }
-            $request->Items = $tempClass->Items;
+
+        //Is Debug Mode
+        if ($this->APIConfig['ShowDebugInfo']) {
+            echo "Request Ojbect for CreateAccessCode";
+            var_dump($request);
         }
 
-        $request = json_encode($request);
-        $response = $this->PostToRapidAPI("AccessCodes", $request);
-        return json_decode($response);
+        //Convert An Object to Target Formats
+        if ($this->APIConfig['Request:Method'] != "SOAP")
+            if ($this->APIConfig['Request:Format'] == "XML")
+                if ($this->APIConfig['Request:Method'] != "RPC")
+                    $request = EwayParser::Obj2XML($request);
+                else
+                    $request = EwayParser::Obj2RPCXML("CreateAccessCode", $request);
+            else {
+                $i = 0;
+                $tempClass = new stdClass;
+                foreach ($request->Options->Option as $Option) {
+                    $tempClass->Options[$i] = $Option;
+                    $i++;
+                }
+                $request->Options = $tempClass->Options;
+                $i = 0;
+                $tempClass = new stdClass;
+                foreach ($request->Items->LineItem as $LineItem) {
+                    $tempClass->Items[$i] = $LineItem;
+                    $i++;
+                }
+                $request->Items = $tempClass->Items;
+                if ($this->APIConfig['Request:Method'] != "RPC")
+                    $request = EwayParser::Obj2JSON($request);
+                else
+                    $request = EwayParser::Obj2JSONRPC("CreateAccessCode", $request);
+            }
+        else
+            $request = EwayParser::Obj2ARRAY($request);
+
+        //Is Debug Mode
+        if ($this->APIConfig['ShowDebugInfo']) {
+            echo "Request String for CreateAccessCode";
+            var_dump($request);
+        }
+
+        $method = 'CreateAccessCode' . $this->APIConfig['Request:Method'];
+
+        $response = $this->$method($request);
+
+        //Is Debug Mode
+        if ($this->APIConfig['ShowDebugInfo']) {
+            echo "Response String for CreateAccessCode";
+            var_dump($response);
+        }
+
+        //Convert Response Back TO An Object
+        if ($this->APIConfig['Request:Method'] != "SOAP")
+            if ($this->APIConfig['Request:Format'] == "XML")
+                if ($this->APIConfig['Request:Method'] != "RPC")
+                    $result = EwayParser::XML2Obj($response);
+                else
+                    $result = EwayParser::RPCXML2Obj($response);
+            else
+            if ($this->APIConfig['Request:Method'] != "RPC")
+                $result = EwayParser::JSON2Obj($response);
+            else
+                $result = EwayParser::JSONRPC2Obj($response);
+        else
+            $result = $response;
+
+        //Is Debug Mode
+        if ($this->APIConfig['ShowDebugInfo']) {
+            echo "Response Object for CreateAccessCode";
+            var_dump($result);
+        }
+
+        return $result;
     }
 
+    /**
+     * Description: Get Result with Access Code
+     * @param GetAccessCodeResultRequest $request
+     * @return StdClass An PHP Ojbect
+     */
     public function GetAccessCodeResult($request) {
-        $request = json_encode($request);
-        $response = $this->PostToRapidAPI("AccessCode/" . $_GET['AccessCode'], $request, false);
-        return json_decode($response);
+
+        if ($this->APIConfig['ShowDebugInfo']) {
+            echo "GetAccessCodeResult Request Object";
+            var_dump($request);
+        }
+
+        //Convert An Object to Target Formats
+        if ($this->APIConfig['Request:Method'] != "SOAP")
+            if ($this->APIConfig['Request:Format'] == "XML")
+                if ($this->APIConfig['Request:Method'] != "RPC")
+                    $request = EwayParser::Obj2XML($request);
+                else
+                    $request = EwayParser::Obj2RPCXML("GetAccessCodeResult", $request);
+            else
+            if ($this->APIConfig['Request:Method'] != "RPC")
+                $request = EwayParser::Obj2JSON($request);
+            else
+                $request = EwayParser::Obj2JSONRPC("GetAccessCodeResult", $request);
+        else
+            $request = EwayParser::Obj2ARRAY($request);
+
+        //Build method name
+        $method = 'GetAccessCodeResult' . $this->APIConfig['Request:Method'];
+
+                //Is Debug Mode
+        if ($this->APIConfig['ShowDebugInfo']) {
+            echo "GetAccessCodeResult Request String";
+            var_dump($request);
+        }
+
+        //Call to the method
+        $response = $this->$method($request);
+
+        //Is Debug Mode
+        if ($this->APIConfig['ShowDebugInfo']) {
+            echo "GetAccessCodeResult Response String";
+            var_dump($response);
+        }
+
+        //Convert Response Back TO An Object
+        if ($this->APIConfig['Request:Method'] != "SOAP")
+            if ($this->APIConfig['Request:Format'] == "XML")
+                if ($this->APIConfig['Request:Method'] != "RPC")
+                    $result = EwayParser::XML2Obj($response);
+                else {
+                    $result = EwayParser::RPCXML2Obj($response);
+
+                    //Tweak the Options Obj to $obj->Options->Option[$i]->Value instead of $obj->Options[$i]->Value
+                    if (isset($result->Options)) {
+                        $i = 0;
+                        $tempClass = new stdClass;
+                        foreach ($result->Options as $Option) {
+                            $tempClass->Option[$i]->Value = $Option->Value;
+                            $i++;
+                        }
+                        $result->Options = $tempClass;
+                    }
+                } else {
+                if ($this->APIConfig['Request:Method'] == "RPC")
+                    $result = EwayParser::JSONRPC2Obj($response);
+                else
+                    $result = EwayParser::JSON2Obj($response);
+
+                //Tweak the Options Obj to $obj->Options->Option[$i]->Value instead of $obj->Options[$i]->Value
+                if (isset($result->Options)) {
+                    $i = 0;
+                    $tempClass = new stdClass;
+                    foreach ($result->Options as $Option) {
+                        $tempClass->Option[$i]->Value = $Option->Value;
+                        $i++;
+                    }
+                    $result->Options = $tempClass;
+                }
+            }
+        else
+            $result = $response;
+
+        //Is Debug Mode
+        if ($this->APIConfig['ShowDebugInfo']) {
+            echo "GetAccessCodeResult Response Object";
+            var_dump($result);
+        }
+
+        return $result;
     }
 
-    public function CreateAccessCodesShared($request) {
-        if ( isset($request->Options) && count($request->Options->Option) ) {
-            $i = 0;
-            $tempClass = new \stdClass();
-            foreach ($request->Options->Option as $Option) {
-                $tempClass->Options[$i] = $Option;
-                $i++;
-            }
-            $request->Options = $tempClass->Options;
-        }
-        if ( isset($request->Items) && count($request->Items->LineItem) ) {
-            $i = 0;
-            $tempClass = new \stdClass();
-            foreach ($request->Items->LineItem as $LineItem) {
-                // must be strings
-                $LineItem->Quantity = strval($LineItem->Quantity);
-                $LineItem->UnitCost = strval($LineItem->UnitCost);
-                $LineItem->Tax = strval($LineItem->Tax);
-                $LineItem->Total = strval($LineItem->Total);
-                $tempClass->Items[$i] = $LineItem;
-                $i++;
-            }
-            $request->Items = $tempClass->Items;
+    /**
+     * Description: Create Access Code Via SOAP
+     * @param Array $request
+     * @return StdClass An PHP Ojbect
+     */
+    public function CreateAccessCodeSOAP($request) {
+
+        try {
+            $client = new SoapClient($this->APIConfig["PaymentService.Soap"], array(
+                        'trace' => false,
+                        'exceptions' => true,
+                        'login' => $this->APIConfig['Payment.Username'],
+                        'password' => $this->APIConfig['Payment.Password'],
+                    ));
+            $result = $client->CreateAccessCode(array('request' => $request));
+        } catch (Exception $e) {
+            $lblError = $e->getMessage();
         }
 
-        $request = json_encode($request);
-        $response = $this->PostToRapidAPI("AccessCodesShared", $request);
-        return json_decode($response);
+        if (isset($lblError)) {
+            echo "<h2>CreateAccessCode SOAP Error: $lblError</h2><pre>";
+            die();
+        }
+        else
+            return $result->CreateAccessCodeResult;
     }
 
-    public function DirectPayment($request) {
-        if ( isset($request->Options) && count($request->Options->Option) ) {
-            $i = 0;
-            $tempClass = new \stdClass();
-            foreach ($request->Options->Option as $Option) {
-                $tempClass->Options[$i] = $Option;
-                $i++;
-            }
-            $request->Options = $tempClass->Options;
-        }
-        if ( isset($request->Items) && count($request->Items->LineItem) ) {
-            $i = 0;
-            $tempClass = new \stdClass();
-            foreach ($request->Items->LineItem as $LineItem) {
-                $tempClass->Items[$i] = $LineItem;
-                $i++;
-            }
-            $request->Items = $tempClass->Items;
+    /**
+     * Description: Get Result with Access Code Via SOAP
+     * @param Array $request
+     * @return StdClass An PHP Ojbect
+     */
+    public function GetAccessCodeResultSOAP($request) {
+
+        try {
+            $client = new SoapClient($this->APIConfig["PaymentService.Soap"], array(
+                        'trace' => false,
+                        'exceptions' => true,
+                        'login' => $this->APIConfig['Payment.Username'],
+                        'password' => $this->APIConfig['Payment.Password'],
+                    ));
+            $result = $client->GetAccessCodeResult(array('request' => $request));
+        } catch (Exception $e) {
+            $lblError = $e->getMessage();
         }
 
-        $request = json_encode($request);
-        $response = $this->PostToRapidAPI("Transaction", $request);
-        return json_decode($response);
+        if (isset($lblError)) {
+            echo "<h2>GetAccessCodeResult SOAP Error: $lblError</h2><pre>";
+            die();
+        }
+        else
+            return $result->GetAccessCodeResultResult;
     }
 
-    /* alias */
-    public function getMessage($code) {
-        return ResponseCode::getMessage($code);
+    /**
+     * Description: Create Access Code Via REST POST
+     * @param XML/JSON Format $request
+     * @return XML/JSON Format Response
+     */
+    public function CreateAccessCodeREST($request) {
+
+        $response = $this->PostToRapidAPI($this->APIConfig["PaymentService.REST"] . "s", $request);
+
+        return $response;
+    }
+
+    /**
+     * Description: Get Result with Access Code Via REST GET
+     * @param XML/JSON Format $request
+     * @return XML/JSON Format Response
+     */
+    public function GetAccessCodeResultREST($request) {
+
+        $response = $this->PostToRapidAPI($this->APIConfig["PaymentService.REST"] . "/" . $_GET['AccessCode'], $request, false);
+
+        return $response;
+    }
+
+    /**
+     * Description: Create Access Code Via HTTP POST
+     * @param XML/JSON Format $request
+     * @return XML/JSON Format Response
+     */
+    public function CreateAccessCodePOST($request) {
+
+        $response = $this->PostToRapidAPI($this->APIConfig["PaymentService.POST.CreateAccessCode"], $request);
+
+        return $response;
+    }
+
+    /**
+     * Description: Get Result with Access Code Via HTTP POST
+     * @param XML/JSON Format $request
+     * @return XML/JSON Format Response
+     */
+    public function GetAccessCodeResultPOST($request) {
+
+        $response = $this->PostToRapidAPI($this->APIConfig["PaymentService.POST.GetAccessCodeResult"], $request);
+
+        return $response;
+    }
+
+    /**
+     * Description: Create Access Code Via HTTP POST
+     * @param XML/JSON Format $request
+     * @return XML/JSON Format Response
+     */
+    public function CreateAccessCodeRPC($request) {
+
+        $response = $this->PostToRapidAPI($this->APIConfig["PaymentService.RPC"], $request);
+
+        return $response;
+    }
+
+    /**
+     * Description: Get Result with Access Code Via HTTP POST
+     * @param XML/JSON Format $request
+     * @return XML/JSON Format Response
+     */
+    public function GetAccessCodeResultRPC($request) {
+
+        $response = $this->PostToRapidAPI($this->APIConfig["PaymentService.RPC"], $request);
+
+        return $response;
     }
 
     /*
      * Description A Function for doing a Curl GET/POST
      */
+
     private function PostToRapidAPI($url, $request, $IsPost = true) {
-        $url = $this->_url . $url;
+
         $ch = curl_init($url);
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: application/json"));
-        curl_setopt($ch, CURLOPT_USERPWD, $this->username . ":" . $this->password);
+        if ($this->APIConfig['Request:Format'] == "XML")
+            curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: text/xml"));
+        else
+            curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: application/json"));
+
+        curl_setopt($ch, CURLOPT_USERPWD, $this->APIConfig['Payment.Username'] . ":" . $this->APIConfig['Payment.Password']);
         if ($IsPost)
             curl_setopt($ch, CURLOPT_POST, true);
         else
@@ -138,231 +348,63 @@ class RapidAPI {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         //curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)");
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-        //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        // curl_setopt($ch, CURLOPT_VERBOSE, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $response = curl_exec($ch);
 
         if (curl_errno($ch) != CURLE_OK) {
             echo "<h2>POST Error: " . curl_error($ch) . " URL: $url</h2><pre>";
             die();
         } else {
-            $info = curl_getinfo($ch);
-            if ($info['http_code'] == 401 || $info['http_code'] == 404) {
-                $__is_in_sandbox = $this->sandbox ? ' (Sandbox)' : ' (Live)';
-                echo "<h2>Please check the API Key and Password $__is_in_sandbox</h2><pre>";
-                die();
-            }
-
             curl_close($ch);
             return $response;
         }
     }
+
 }
 
-class ResponseCode {
-    private static $_codes = array(
-        'F7000' => "Undefined Fraud",
-        'V5000' => "Undefined System",
-        'A0000' => "Undefined Approved",
-        'A2000' => "Transaction Approved",
-        'A2008' => "Honour With Identification",
-        'A2010' => "Approved For Partial Amount",
-        'A2011' => "Approved VIP",
-        'A2016' => "Approved Update Track 3",
-        'V6000' => "Undefined Validation",
-        'V6001' => "Invalid Request CustomerIP",
-        'V6002' => "Invalid Request DeviceID",
-        'V6011' => "Invalid Payment Amount",
-        'V6012' => "Invalid Payment InvoiceDescription",
-        'V6013' => "Invalid Payment InvoiceNumber",
-        'V6014' => "Invalid Payment InvoiceReference",
-        'V6015' => "Invalid Payment CurrencyCode",
-        'V6016' => "Payment Required",
-        'V6017' => "Payment CurrencyCode Required",
-        'V6018' => "Unknown Payment CurrencyCode",
-        'V6021' => "Cardholder Name Required",
-        'V6022' => "Card Number Required",
-        'V6023' => "CVN Required",
-        'V6031' => "Invalid Card Number",
-        'V6032' => "Invalid CVN",
-        'V6033' => "Invalid Expiry Date",
-        'V6034' => "Invalid Issue Number",
-        'V6035' => "Invalid Start Date",
-        'V6036' => "Invalid Month",
-        'V6037' => "Invalid Year",
-        'V6040' => "Invalid Token Customer Id",
-        'V6041' => "Customer Required",
-        'V6042' => "Customer First Name Required",
-        'V6043' => "Customer Last Name Required",
-        'V6044' => "Customer Country Code Required",
-        'V6045' => "Customer Title Required",
-        'V6046' => "Token Customer ID Required",
-        'V6047' => "RedirectURL Required",
-        'V6051' => "Invalid Customer First Name",
-        'V6052' => "Invalid Customer Last Name",
-        'V6053' => "Invalid Customer Country Code",
-        'V6054' => "Invalid Customer Email",
-        'V6055' => "Invalid Customer Phone",
-        'V6056' => "Invalid Customer Mobile",
-        'V6057' => "Invalid Customer Fax",
-        'V6058' => "Invalid Customer Title",
-        'V6059' => "Redirect URL Invalid",
-        'V6060' => "Redirect URL Invalid",
-        'V6061' => "Invalid Customer Reference",
-        'V6062' => "Invalid Customer CompanyName",
-        'V6063' => "Invalid Customer JobDescription",
-        'V6064' => "Invalid Customer Street1",
-        'V6065' => "Invalid Customer Street2",
-        'V6066' => "Invalid Customer City",
-        'V6067' => "Invalid Customer State",
-        'V6068' => "Invalid Customer Postalcode",
-        'V6069' => "Invalid Customer Email",
-        'V6070' => "Invalid Customer Phone",
-        'V6071' => "Invalid Customer Mobile",
-        'V6072' => "Invalid Customer Comments",
-        'V6073' => "Invalid Customer Fax",
-        'V6074' => "Invalid Customer Url",
-        'V6075' => "Invalid ShippingAddress FirstName",
-        'V6076' => "Invalid ShippingAddress LastName",
-        'V6077' => "Invalid ShippingAddress Street1",
-        'V6078' => "Invalid ShippingAddress Street2",
-        'V6079' => "Invalid ShippingAddress City",
-        'V6080' => "Invalid ShippingAddress State",
-        'V6081' => "Invalid ShippingAddress PostalCode",
-        'V6082' => "Invalid ShippingAddress Email",
-        'V6083' => "Invalid ShippingAddress Phone",
-        'V6084' => "Invalid ShippingAddress Country",
-        'V6091' => "Unknown Country Code",
-        'V6100' => "Invalid ProcessRequest name",
-        'V6101' => "Invalid ProcessRequest ExpiryMonth",
-        'V6102' => "Invalid ProcessRequest ExpiryYear",
-        'V6103' => "Invalid ProcessRequest StartMonth",
-        'V6104' => "Invalid ProcessRequest StartYear",
-        'V6105' => "Invalid ProcessRequest IssueNumber",
-        'V6106' => "Invalid ProcessRequest CVN",
-        'V6107' => "Invalid ProcessRequest AccessCode",
-        'V6108' => "Invalid ProcessRequest CustomerHostAddress",
-        'V6109' => "Invalid ProcessRequest UserAgent",
-        'V6110' => "Invalid ProcessRequest Number",
-        'D4401' => "Refer to Issuer",
-        'D4402' => "Refer to Issuer, special",
-        'D4403' => "No Merchant",
-        'D4404' => "Pick Up Card",
-        'D4405' => "Do Not Honour",
-        'D4406' => "Error",
-        'D4407' => "Pick Up Card, Special",
-        'D4409' => "Request In Progress",
-        'D4412' => "Invalid Transaction",
-        'D4413' => "Invalid Amount",
-        'D4414' => "Invalid Card Number",
-        'D4415' => "No Issuer",
-        'D4419' => "Re-enter Last Transaction",
-        'D4421' => "No Method Taken",
-        'D4422' => "Suspected Malfunction",
-        'D4423' => "Unacceptable Transaction Fee",
-        'D4425' => "Unable to Locate Record On File",
-        'D4430' => "Format Error",
-        'D4431' => "Bank Not Supported By Switch",
-        'D4433' => "Expired Card, Capture",
-        'D4434' => "Suspected Fraud, Retain Card",
-        'D4435' => "Card Acceptor, Contact Acquirer, Retain Card",
-        'D4436' => "Restricted Card, Retain Card",
-        'D4437' => "Contact Acquirer Security Department, Retain Card",
-        'D4438' => "PIN Tries Exceeded, Capture",
-        'D4439' => "No Credit Account",
-        'D4440' => "Function Not Supported",
-        'D4441' => "Lost Card",
-        'D4442' => "No Universal Account",
-        'D4443' => "Stolen Card",
-        'D4444' => "No Investment Account",
-        'D4451' => "Insufficient Funds",
-        'D4452' => "No Cheque Account",
-        'D4453' => "No Savings Account",
-        'D4454' => "Expired Card",
-        'D4455' => "Incorrect PIN",
-        'D4456' => "No Card Record",
-        'D4457' => "Function Not Permitted to Cardholder",
-        'D4458' => "Function Not Permitted to Terminal",
-        'D4460' => "Acceptor Contact Acquirer",
-        'D4461' => "Exceeds Withdrawal Limit",
-        'D4462' => "Restricted Card",
-        'D4463' => "Security Violation",
-        'D4464' => "Original Amount Incorrect",
-        'D4466' => "Acceptor Contact Acquirer, Security",
-        'D4467' => "Capture Card",
-        'D4475' => "PIN Tries Exceeded",
-        'D4482' => "CVV Validation Error",
-        'D4490' => "Cutoff In Progress",
-        'D4491' => "Card Issuer Unavailable",
-        'D4492' => "Unable To Route Transaction",
-        'D4493' => "Cannot Complete, Violation Of The Law",
-        'D4494' => "Duplicate Transaction",
-        'D4496' => "System Error",
-    );
-
-    public static function getMessage($code) {
-        if (isset(ResponseCode::$_codes[$code])) {
-            return ResponseCode::$_codes[$code];
-        } else {
-            return $code;
-        }
-    }
-}
-
+/**
+ * Description of CreateAccessCodeRequest
+ *
+ *
+ */
 class CreateAccessCodeRequest {
+
+    /**
+     * @var Customer $Customer
+     */
     public $Customer;
 
+    /**
+     * @var ShippingAddress $ShippingAddress
+     */
     public $ShippingAddress;
     public $Items;
     public $Options;
 
+    /**
+     * @var Payment $Payment
+     */
     public $Payment;
     public $RedirectUrl;
     public $Method;
-    public $TransactionType;
     private $CustomerIP;
     private $DeviceID;
 
     function __construct() {
-        $this->Customer = new Customer();
-        $this->ShippingAddress = new ShippingAddress();
-        $this->Payment = new Payment();
+
+        $this->Customer = new EwayCustomer();
+        $this->ShippingAddress = new EwayShippingAddress();
+        $this->Payment = new EwayPayment();
         $this->CustomerIP = $_SERVER["SERVER_NAME"];
     }
-}
 
-class CreateAccessCodesSharedRequest extends CreateAccessCodeRequest {
-    public $CancelUrl;
-    public $LogoUrl;
-    public $HeaderText;
-    public $CustomerReadOnly;
-}
-
-class CreateDirectPaymentRequest {
-    public $Customer;
-
-    public $ShippingAddress;
-    public $Items;
-    public $Options;
-
-    public $Payment;
-    private $CustomerIP;
-    private $DeviceID;
-    public $TransactionType;
-    public $PartnerID;
-
-    function __construct() {
-        $this->Customer = new CardCustomer();
-        $this->ShippingAddress = new ShippingAddress();
-        $this->Payment = new Payment();
-        $this->CustomerIP = $_SERVER["SERVER_NAME"];
-    }
 }
 
 /**
  * Description of Customer
  */
-class Customer {
+class EwayCustomer {
+
     public $TokenCustomerID;
     public $Reference;
     public $Title;
@@ -382,15 +424,11 @@ class Customer {
     public $Comments;
     public $Fax;
     public $Url;
+
 }
 
-class CardCustomer extends Customer {
-    function __construct() {
-        $this->CardDetails = new CardDetails();
-    }
-}
+class EwayShippingAddress {
 
-class ShippingAddress {
     public $FirstName;
     public $LastName;
     public $Street1;
@@ -402,30 +440,36 @@ class ShippingAddress {
     public $Email;
     public $Phone;
     public $ShippingMethod;
+
 }
 
-class Items {
+class EwayItems {
+
     public $LineItem = array();
+
 }
 
-class LineItem {
+class EwayLineItem {
+
     public $SKU;
     public $Description;
-    public $Quantity;
-    public $UnitCost;
-    public $Tax;
-    public $Total;
+
 }
 
-class Options {
+class EwayOptions {
+
     public $Option = array();
+
 }
 
-class Option {
+class EwayOption {
+
     public $Value;
+
 }
 
-class Payment {
+class EwayPayment {
+
     public $TotalAmount;
     /// <summary>The merchant's invoice number</summary>
     public $InvoiceNumber;
@@ -435,19 +479,169 @@ class Payment {
     public $InvoiceReference;
     /// <summary>The merchant's currency</summary>
     public $CurrencyCode;
+
 }
 
 class GetAccessCodeResultRequest {
+
     public $AccessCode;
+
 }
 
-class CardDetails {
-    public $Name;
-    public $Number;
-    public $ExpiryMonth;
-    public $ExpiryYear;
-    public $StartMonth;
-    public $StartYear;
-    public $IssueNumber;
-    public $CVN;
+/*
+ * Description A Class for conversion between different formats
+ */
+
+class EwayParser {
+
+    public static function Obj2JSON($obj) {
+
+        return json_encode($obj);
+    }
+
+    public static function Obj2JSONRPC($APIAction, $obj) {
+
+        if ($APIAction == "CreateAccessCode") {
+            //Tweak the request object in order to generate a valid JSON-RPC format for RapidAPI.
+            $obj->Payment->TotalAmount = (int) $obj->Payment->TotalAmount;
+        }
+
+        $tempClass = new stdClass;
+        $tempClass->id = 1;
+        $tempClass->method = $APIAction;
+        $tempClass->params->request = $obj;
+
+        return json_encode($tempClass);
+    }
+
+    public static function Obj2ARRAY($obj) {
+        //var_dump($obj);
+        return get_object_vars($obj);
+    }
+
+    public static function Obj2XML($obj) {
+
+        $xml = new XmlWriter();
+        $xml->openMemory();
+        $xml->setIndent(TRUE);
+
+        $xml->startElement(get_class($obj));
+        $xml->writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        $xml->writeAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
+
+        self::getObject2XML($xml, $obj);
+
+        $xml->endElement();
+
+        $xml->endElement();
+
+        return $xml->outputMemory(true);
+    }
+
+    public static function Obj2RPCXML($APIAction, $obj) {
+
+        if ($APIAction == "CreateAccessCode") {
+            //Tweak the request object in order to generate a valid XML-RPC format for RapidAPI.
+            $obj->Payment->TotalAmount = (int) $obj->Payment->TotalAmount;
+
+            $obj->Items = $obj->Items->LineItem;
+
+            $obj->Options = $obj->Options->Option;
+
+            $obj->Customer->TokenCustomerID = (float) (isset($obj->Customer->TokenCustomerID) ? $obj->Customer->TokenCustomerID : null);
+
+            return str_replace("double>", "long>", xmlrpc_encode_request($APIAction, get_object_vars($obj)));
+        }
+
+        if ($APIAction == "GetAccessCodeResult") {
+            return xmlrpc_encode_request($APIAction, get_object_vars($obj));
+        }
+    }
+
+    public static function JSON2Obj($obj) {
+        return json_decode($obj);
+    }
+
+    public static function JSONRPC2Obj($obj) {
+
+
+        $tempClass = json_decode($obj);
+
+        if (isset($tempClass->error)) {
+            $tempClass->Errors = $tempClass->error->data;
+            return $tempClass;
+        }
+
+        return $tempClass->result;
+    }
+
+    public static function XML2Obj($obj) {
+        //Strip the empty JSON object
+        return json_decode(str_replace("{}", "null", json_encode(simplexml_load_string($obj))));
+    }
+
+    public static function RPCXML2Obj($obj) {
+        return json_decode(json_encode(xmlrpc_decode($obj)));
+    }
+
+    public static function HasProperties($obj) {
+        if (is_object($obj)) {
+            $reflect = new ReflectionClass($obj);
+            $props = $reflect->getProperties();
+            return !empty($props);
+        }
+        else
+            return TRUE;
+    }
+
+    private static function getObject2XML(XMLWriter $xml, $data) {
+        foreach ($data as $key => $value) {
+
+            if ($key == "TokenCustomerID" && $value == "") {
+                $xml->startElement("TokenCustomerID");
+                $xml->writeAttribute("xsi:nil", "true");
+                $xml->endElement();
+            }
+
+            if (is_object($value)) {
+                $xml->startElement($key);
+                self::getObject2XML($xml, $value);
+                $xml->endElement();
+                continue;
+            } else if (is_array($value)) {
+                self::getArray2XML($xml, $key, $value);
+            }
+
+            if (is_string($value)) {
+                $xml->writeElement($key, $value);
+            }
+        }
+    }
+
+    private static function getArray2XML(XMLWriter $xml, $keyParent, $data) {
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                $xml->writeElement($keyParent, $value);
+                continue;
+            }
+
+            if (is_numeric($key)) {
+                $xml->startElement($keyParent);
+            }
+
+            if (is_object($value)) {
+                self::getObject2XML($xml, $value);
+            } else if (is_array($value)) {
+                $this->getArray2XML($xml, $key, $value);
+                continue;
+            }
+
+            if (is_numeric($key)) {
+                $xml->endElement();
+            }
+        }
+    }
+
 }
+
+?>
