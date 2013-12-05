@@ -189,9 +189,9 @@ class Gateway {
             $item->SKU = $product['product_id'];
             $item->Description = $product['name'];
             $item->Quantity = $product['quantity'];
-            $item->UnitCost = $product['price'];
-            if (isset($product['tax_each'])) $item->Tax = $product['tax_each'];
-            $item->Total = $product['total_price_each'];
+            $item->UnitCost = number_format($product['price'], 2, '.', '') * 100;
+            if (isset($product['tax_each'])) $item->Tax = number_format($product['tax_each'], 2, '.', '') * 100;
+            $item->Total = number_format($product['total_price_each'] * $product['quantity'], 2, '.', '') * 100;
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $product['name'] . ', ';
         }
