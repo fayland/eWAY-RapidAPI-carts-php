@@ -164,9 +164,9 @@ class plgVMPaymentEwaysharedpage extends vmPSPlugin {
             $item->SKU = $_item->order_item_sku;
             $item->Description = $_item->order_item_name;
             $item->Quantity = $_item->product_quantity;
-            $item->UnitCost = $_item->product_item_price;
-            $item->Tax = $_item->product_tax;
-            $item->Total = $_item->product_subtotal_with_tax;
+            $item->UnitCost = number_format($_item->product_item_price, 2, '.', '') * 100;
+            $item->Tax = number_format($_item->product_tax, 2, '.', '') * 100;
+            $item->Total = number_format($_item->product_subtotal_with_tax, 2, '.', '') * 100;
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $_item->order_item_name . ', ';
         }
