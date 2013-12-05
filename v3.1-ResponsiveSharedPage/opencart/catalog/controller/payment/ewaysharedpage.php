@@ -60,8 +60,8 @@ class ControllerPaymentEwaysharedpage extends Controller {
             $item->SKU = $product['product_id'];
             $item->Description = $product['name'];
             $item->Quantity = $product['quantity'];
-            $item->UnitCost = $product['price'];
-            $item->Total = $product['total'];
+            $item->UnitCost = number_format($product['price'], 2, '.', '') * 100;
+            $item->Total = number_format($product['total'], 2, '.', '') * 100;
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $product['name'] . ', ';
         }

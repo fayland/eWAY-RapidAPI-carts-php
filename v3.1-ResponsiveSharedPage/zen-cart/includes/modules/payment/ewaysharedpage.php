@@ -141,9 +141,9 @@ class ewaysharedpage extends base {
             $item->SKU = $product['id'];
             $item->Description = $product['name'];
             $item->Quantity = $product['qty'];
-            $item->UnitCost = $product['price'];
-            if (isset($product['tax'])) $item->Tax = $product['tax'];
-            $item->Total = $product['final_price'] * $product['qty'];
+            $item->UnitCost = number_format($product['price'], 2, '.', '') * 100;
+            if (isset($product['tax'])) $item->Tax = number_format($product['tax'], 2, '.', '') * 100;
+            $item->Total = number_format($product['final_price'] * $product['qty'], 2, '.', '') * 100;
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $product['name'] . ', ';
         }

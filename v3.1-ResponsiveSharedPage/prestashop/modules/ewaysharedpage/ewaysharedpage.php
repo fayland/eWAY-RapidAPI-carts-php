@@ -162,9 +162,9 @@ class Ewaysharedpage extends PaymentModule {
             $item->SKU = $product['id_product'];
             $item->Description = $product['name'];
             $item->Quantity = $product['cart_quantity'];
-            $item->UnitCost = $product['price_wt'];
-            if (isset($product['ecotax'])) $item->Tax = $product['ecotax'];
-            $item->Total = $product['total_wt'];
+            $item->UnitCost = number_format($product['price_wt'], 2, '.', '') * 100;
+            if (isset($product['ecotax'])) $item->Tax = number_format($product['ecotax'], 2, '.', '') * 100;
+            $item->Total = number_format($product['total_wt'], 2, '.', '') * 100;
             $request->Items->LineItem[] = $item;
             $invoiceDesc .= $product['name'] . ', ';
         }
