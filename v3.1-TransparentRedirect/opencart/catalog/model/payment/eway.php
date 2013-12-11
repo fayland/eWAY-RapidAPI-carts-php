@@ -27,5 +27,11 @@ class ModelPaymentEway extends Model {
 
         return $method_data;
     }
+
+    public function addOrder($order_data) {
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "eway_order` SET `order_id` = '" . (int) $order_data['order_id'] . "', `created` = NOW(), `modified` = NOW(), `debug_data` = '" . $this->db->escape($order_data['debug_data']) . "', `amount` = '" . (double) $order_data['amount'] . "', `transaction_id` = '" . $this->db->escape($order_data['transaction_id']) . "'");
+
+        return $this->db->getLastId();
+    }
 }
 ?>

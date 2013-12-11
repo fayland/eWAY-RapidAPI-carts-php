@@ -80,6 +80,33 @@ class ControllerPaymentEway extends Controller {
 		$this->response->setOutput($this->render(TRUE), $this->config->get('config_compression'));
 	}
 
+	public function install() {
+        $this->load->model('payment/eway');
+        $this->model_payment_eway->install();
+    }
+
+    public function uninstall() {
+        $this->load->model('payment/eway');
+        $this->model_payment_eway->uninstall();
+    }
+
+    public function orderAction() {
+        $this->load->model('payment/eway');
+
+        $eway_order = $this->model_payment_eway->getOrder($this->request->get['order_id']);
+        if ($eway_order) {
+            $this->data['eway_order'] = $eway_order;
+            $this->data['token'] = $this->session->data['token'];
+
+            $this->data['order_id'] = $this->request->get['order_id'];
+
+            $this->data['refund_link'] = $this->url->link('payment/eway/refund', 'token=' . $this->session->data['token'], 'SSL');
+
+            $this->template = 'payment/eway_order.tpl';
+            $this->response->setOutput($this->render());
+        }
+    }
+
 	private function validate() {
 		if (!$this->user->hasPermission('modify', 'payment/eway')) {
 			$this->error['warning'] = $this->language->get('error_permission');

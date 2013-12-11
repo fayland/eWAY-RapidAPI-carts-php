@@ -200,6 +200,16 @@ class ControllerPaymentEway extends Controller {
                 $order_id = $result->Options[0]->Value;
                 $this->load->model('checkout/order');
                 $order_info = $this->model_checkout_order->getOrder($order_id);
+
+                $this->load->model('payment/eway');
+                $eway_order_data = array(
+                    'order_id' => $order_id,
+                    'transaction_id' => $result->TransactionID,
+                    'amount' => $result->TotalAmount / 100,
+                    'debug_data' => json_encode($result),
+                );
+                $this->model_payment_eway->addOrder($eway_order_data);
+
                 $this->model_checkout_order->confirm($order_id, $this->config->get('eway_order_status_id'));
                 header('location:' . $this->url->link('checkout/success', '', 'SSL'));
             }
