@@ -32,6 +32,15 @@ class ModelPaymentEway extends Model {
         }
     }
 
+    public function AddRefundRecord($order, $result) {
+        $TransactionID = $result->TransactionID;
+        $TotalAmount = $result->Refund->TotalAmount / 100;
+        $refund_amount = $order['refund_amount'] + $TotalAmount;
 
+        if (strlen($order['refund_transaction_id'])) $order['refund_transaction_id'] .= ',';
+        $order['refund_transaction_id'] .= $TransactionID;
+
+        $this->db->query("UPDATE `" . DB_PREFIX . "eway_order` SET refund_amount = '" . (double) $refund_amount . "', `refund_transaction_id` = '" . $this->db->escape($order['refund_transaction_id']) . "' WHERE eway_order_id = " . $order['eway_order_id']);
+    }
 }
 ?>
