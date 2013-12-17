@@ -14,30 +14,44 @@ class eway_rapid extends base {
     var $enableDirectPayment = true;
 
     function eway_rapid() {
-      global $order;
+        global $order;
 
-      $this->code = 'eway_rapid';
-      $this->codeTitle = MODULE_PAYMENT_EWAYRAPID_TEXT_TITLE;
-      $this->codeVersion = '3.1.0';
-      $this->enableDirectPayment = true;
-      $this->title = MODULE_PAYMENT_EWAYRAPID_TEXT_TITLE;
+        $this->code = 'eway_rapid';
+        $this->codeTitle = MODULE_PAYMENT_EWAYRAPID_TEXT_TITLE;
+        $this->codeVersion = '3.1.0';
+        $this->enableDirectPayment = true;
+        $this->title = MODULE_PAYMENT_EWAYRAPID_TEXT_TITLE;
 
-      if (MODULE_PAYMENT_EWAYRAPID_STATUS == 'True' && MODULE_PAYMENT_EWAYRAPID_USERNAME== '') {
-        $this->title .= '<span class="alert"> (Not Configured)</span>';
-      } elseif (MODULE_PAYMENT_EWAYRAPID_MODE == 'True') {
-        $this->title .= '<span class="alert"> (in Testing mode)</span>';
-      }
+        if (MODULE_PAYMENT_EWAYRAPID_STATUS == 'True' && MODULE_PAYMENT_EWAYRAPID_USERNAME== '') {
+            $this->title .= '<span class="alert"> (Not Configured)</span>';
+        } elseif (MODULE_PAYMENT_EWAYRAPID_MODE == 'True') {
+            $this->title .= '<span class="alert"> (in Testing mode)</span>';
+        }
 
-      $this->public_title = MODULE_PAYMENT_EWAYRAPID_TEXT_PUBLIC_TITLE;
-      $this->description = MODULE_PAYMENT_EWAYRAPID_TEXT_DESCRIPTION;
-      $this->sort_order = MODULE_PAYMENT_EWAYRAPID_SORT_ORDER;
-      $this->enabled = ((MODULE_PAYMENT_EWAYRAPID_STATUS == 'True') ? true : false);
+        $eway_payment_type = MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE;
+        $title = MODULE_PAYMENT_EWAYRAPID_TEXT_PUBLIC_TITLE;
+        if ($eway_payment_type === 'vme') {
+            $title = "<img src='images/eway_vme.png' height='20' />";
+        } elseif ($eway_payment_type === 'masterpass') {
+            $title = "<img src='images/eway_masterpass.png' height='20' />";
+        } elseif ($eway_payment_type === 'paypal') {
+            $title = "<img src='images/eway_paypal.png' height='20' />";
+        } elseif ($eway_payment_type === 'creditcard') {
+            $title = "<img src='images/eway_creditcard_visa.png' height='20' /> <img src='images/eway_creditcard_master.png' height='20' />";
+        } else {
+            $title = "<img src='images/eway_creditcard_visa.png' height='20' /> <img src='images/eway_creditcard_master.png' height='20' /> <img src='images/eway_paypal.png' height='20' /> <img src='images/eway_masterpass.png' height='20' /> <img src='images/eway_vme.png' height='20' />";
+        }
 
-      if ((int)MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID > 0) {
+        $this->public_title = $title;
+        $this->description = MODULE_PAYMENT_EWAYRAPID_TEXT_DESCRIPTION;
+        $this->sort_order = MODULE_PAYMENT_EWAYRAPID_SORT_ORDER;
+        $this->enabled = ((MODULE_PAYMENT_EWAYRAPID_STATUS == 'True') ? true : false);
+
+        if ((int)MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID > 0) {
         $this->order_status = MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID;
-      }
+        }
 
-      if (is_object($order)) $this->update_status();
+        if (is_object($order)) $this->update_status();
     }
 
     function update_status() {
@@ -90,8 +104,8 @@ class eway_rapid extends base {
 
         $amount = number_format($order->info['total'], 2, '.', '') * 100;
         $transact_url = zen_href_link(FILENAME_CHECKOUT_PROCESS, 'referer=eway_rapid', 'SSL', true, false);
-        $customerId = $_SESSION['customer_id'];				// customerId
-        $merchantRef = $customerId."-".date("YmdHis");		// merchant reference
+        $customerId = $_SESSION['customer_id'];             // customerId
+        $merchantRef = $customerId."-".date("YmdHis");      // merchant reference
 
         require_once(realpath(dirname(__FILE__).'/eway_rapid/lib/eWAY/RapidAPI.php'));
         $__username = MODULE_PAYMENT_EWAYRAPID_USERNAME;
@@ -365,17 +379,17 @@ class eway_rapid extends base {
 
         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable eWAY Payment Module', 'MODULE_PAYMENT_EWAYRAPID_STATUS', 'True', 'Do you want to authorize payment through eWAY Payment?', '6', '0', 'zen_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
-		$db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Test Mode', 'MODULE_PAYMENT_EWAYRAPID_MODE', 'True', 'You can set to go to testing mode here.', '6', '0', 'zen_cfg_select_option(array(\'True\', \'False\'), ', now())");
+        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Test Mode', 'MODULE_PAYMENT_EWAYRAPID_MODE', 'True', 'You can set to go to testing mode here.', '6', '0', 'zen_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
-		$db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('eWAY API Key', 'MODULE_PAYMENT_EWAYRAPID_USERNAME', '', 'Your eWAY API Key registered when you join eWAY.', '6', '0', now())");
+        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('eWAY API Key', 'MODULE_PAYMENT_EWAYRAPID_USERNAME', '', 'Your eWAY API Key registered when you join eWAY.', '6', '0', now())");
 
-		$db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('eWay Password', 'MODULE_PAYMENT_EWAYRAPID_PASSWORD', '', 'Your eWAY password registered when you join eWAY.', '6', '0', now())");
+        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('eWay Password', 'MODULE_PAYMENT_EWAYRAPID_PASSWORD', '', 'Your eWAY password registered when you join eWAY.', '6', '0', now())");
 
         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('eWAY Payment Type', 'MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE', 'USER_PICK', 'The type of payment you are processing (new). USER_PICK will show options to customer.', '6', '0', 'zen_cfg_select_option(array(\'USER_PICK\', \'creditcard\', \'paypal\', \'masterpass\', \'vme\'), ', now())");
 
-		$db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value', '6', '0', 'zen_cfg_pull_down_order_statuses(', 'zen_get_order_status_name', now())");
+        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value', '6', '0', 'zen_cfg_pull_down_order_statuses(', 'zen_get_order_status_name', now())");
 
-		$db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_EWAYRAPID_SORT_ORDER', '1', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
+        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_EWAYRAPID_SORT_ORDER', '1', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
     }
 
     function remove() {
