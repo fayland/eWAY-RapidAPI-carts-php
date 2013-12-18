@@ -64,6 +64,9 @@ class ControllerPaymentEway extends Controller {
                 $this->data[$vk] = $this->config->get($vk);
             }
         }
+        if (! is_array($this->data['eway_payment_type'])) {
+            $this->data['eway_payment_type'] = array();
+        }
 
         $this->load->model('localisation/geo_zone');
         $this->data['geo_zones'] = $this->model_localisation_geo_zone->getGeoZones();

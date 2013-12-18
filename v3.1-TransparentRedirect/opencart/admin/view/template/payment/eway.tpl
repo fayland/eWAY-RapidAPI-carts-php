@@ -69,13 +69,12 @@
         </tr>
         <tr>
           <td><?php echo $entry_payment_type; ?></td>
-          <td><select name="eway_payment_type">
-              <option value="USER_PICK">User Pick</option>
-              <option value="creditcard"<?php if ($eway_payment_type == 'creditcard') { echo " selected='selected'"; } ?>>Credit Card</option>
-              <option value="paypal"<?php if ($eway_payment_type == 'paypal') { echo " selected='selected'"; } ?>>PayPal</option>
-              <option value="masterpass"<?php if ($eway_payment_type == 'masterpass') { echo " selected='selected'"; } ?>>MasterPass</option>
-              <option value="vme"<?php if ($eway_payment_type == 'vme') { echo " selected='selected'"; } ?>>V.me By Visa</option>
-            </select></td>
+          <td>
+              <input type='checkbox' name='eway_payment_type[]' value='creditcard' <?php if (in_array('creditcard', $eway_payment_type)) { echo " checked='checked'"; } ?> /> Credit Card
+              <input type='checkbox' name='eway_payment_type[]' value='paypal' <?php if (in_array('paypal', $eway_payment_type)) { echo " checked='checked'"; } ?> /> PayPal
+              <input type='checkbox' name='eway_payment_type[]' value='masterpass' <?php if (in_array('masterpass', $eway_payment_type)) { echo " checked='checked'"; } ?> /> MasterPass
+              <input type='checkbox' name='eway_payment_type[]' value='vme' <?php if (in_array('vme', $eway_payment_type)) { echo " checked='checked'"; } ?> /> V.me By Visa
+          </td>
           <td><?php echo $help_payment_type ?></td>
         </tr>
         <tr>
