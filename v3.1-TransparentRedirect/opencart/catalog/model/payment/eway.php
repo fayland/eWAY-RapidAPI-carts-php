@@ -19,23 +19,26 @@ class ModelPaymentEway extends Model {
         $method_data = array();
         if ($status) {
             // use images
-            $eway_payment_type = $this->config->get('eway_payment_type');
-            $title = $this->language->get('text_title');
-            if ($eway_payment_type === 'vme') {
-                $title = "<img src='catalog/view/theme/default/image/eway_vme.png' height='34' />";
-            } elseif ($eway_payment_type === 'masterpass') {
-                $title = "<img src='catalog/view/theme/default/image/eway_masterpass.png' height='34' />";
-            } elseif ($eway_payment_type === 'paypal') {
-                $title = "<img src='catalog/view/theme/default/image/eway_paypal.png' height='34' />";
-            } elseif ($eway_payment_type === 'creditcard') {
-                $title = "<img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='34' /> <img src='catalog/view/theme/default/image/eway_creditcard_master.png' height='34' />";
-            } else {
-                $title = "<img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='34' /> <img src='catalog/view/theme/default/image/eway_creditcard_master.png' height='34' /> <img src='catalog/view/theme/default/image/eway_paypal.png' height='34' /> <img src='catalog/view/theme/default/image/eway_masterpass.png' height='34' /> <img src='catalog/view/theme/default/image/eway_vme.png' height='34' />";
+            $eway_payment_type = (array) $this->config->get('eway_payment_type');
+            if (count($eway_payment_type) == 0) $eway_payment_type = array('creditcard', 'paypal', 'masterpass', 'vme');
+            $images = array();
+
+            if (in_array('creditcard', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='34' /> <img src='catalog/view/theme/default/image/eway_creditcard_master.png' height='34' />";
+            }
+            if (in_array('paypal', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_paypal.png' height='34' />";
+            }
+            if (in_array('masterpass', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_masterpass.png' height='34' />";
+            }
+            if (in_array('vme', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_vme.png' height='34' />";
             }
 
             $method_data = array(
                 'code'       => 'eway',
-                'title'      => $title,
+                'title'      => implode(' ', $images),
                 'sort_order' => $this->config->get('eway_sort_order')
             );
         }

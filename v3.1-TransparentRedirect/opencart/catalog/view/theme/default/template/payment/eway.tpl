@@ -17,11 +17,11 @@
       return false;
     }
   }
-    function ChoosePaymentOption(v) {
-        if (v != "creditcard") {
-            document.getElementById("creditcard_info").style.display = "none";
-        } else {
+    function IsCC_checked(v) {
+        if (v) {
             document.getElementById("creditcard_info").style.display = "block";
+        } else {
+            document.getElementById("creditcard_info").style.display = "none";
         }
     }
 //-->
@@ -33,30 +33,28 @@
   <div class="warning"><?php echo $text_testing; ?></div>
   <?php } ?>
 
-    <?php if ($payment_type == 'paypal' || $payment_type == 'masterpass' || $payment_type == 'vme') { ?>
-    <input type='hidden' name='EWAY_PAYMENTTYPE' value='<?php echo $payment_type ?>' />
-    <?php } else { ?>
+    <?php
+        if (count($payment_type) == 0) $payment_type = array('creditcard', 'paypal', 'masterpass', 'vme');
+        if (count($payment_type) == 1) {
+            echo "<input type='hidden' name='EWAY_PAYMENTTYPE' value='" . $payment_type . "' />";
+        } else {
+            if (in_array('creditcard', $payment_type)) {
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:IsCC_checked(true)' /> <img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='34' /> <img src='catalog/view/theme/default/image/eway_creditcard_master.png' height='34' /></label> ";
+            }
+            if (in_array('paypal', $payment_type)) {
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='paypal' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_paypal.png' height='34' /></label> ";
+            }
+            if (in_array('masterpass', $payment_type)) {
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='masterpass' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_masterpass.png' height='34' /></label> ";
+            }
+            if (in_array('vme', $payment_type)) {
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='vme' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_vme.png' height='34' /></label> ";
+            }
+        }
+    ?>
 
-    <?php if ($payment_type != 'creditcard') { ?>
-<div class="content">
-<table cellspacing="0" cellpadding="3" border="0">
-    <tr>
-        <td>
-<label class="inputLabelPayment">Select Payment Option:</label>
-        </td>
-        <td>
-<select name="EWAY_PAYMENTTYPE" onchange="javascript:ChoosePaymentOption(this.options[this.options.selectedIndex].value)">
-    <option value="creditcard">Credit Card</option>
-    <option value="paypal">PayPal</option>
-    <option value="masterpass">MasterPass</option>
-    <option value="vme">V.me By Visa</option>
-</select>
-        </td>
-    </tr>
-</table>
-</div>
-    <?php } ?>
 
+    <?php if (in_array('creditcard', $payment_type)) { ?>
 <div class="content" id="creditcard_info">
 <font size="2pt"><strong>Credit Card Payment</strong></font>
 <table id="eway_table" cellspacing="0" cellpadding="3" border="0">
@@ -109,9 +107,10 @@
 </td></tr>
 
 </table>
+    <?php } ?>
+
 </form>
 </div>
-    <?php } ?>
 
 <div class="buttons">
     <div class="right"><a onclick="$('#payment').submit();" class="button"><span><?php echo $button_confirm; ?></span></a></div>
