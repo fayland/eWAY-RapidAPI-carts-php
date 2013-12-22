@@ -23,17 +23,29 @@ class ModelPaymentEway extends Model {
             if (count($eway_payment_type) == 0) $eway_payment_type = array('creditcard', 'paypal', 'masterpass', 'vme');
             $images = array();
 
-            if (in_array('creditcard', $eway_payment_type)) {
-                $images[] = "<img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='34' /> <img src='catalog/view/theme/default/image/eway_creditcard_master.png' height='34' />";
+            if (in_array('visa', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='30' />";
+            }
+            if (in_array('mastercard', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_creditcard_master.png' height='30' />";
+            }
+            if (in_array('diners', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_creditcard_diners.png' height='30' />";
+            }
+            if (in_array('jcb', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_creditcard_jcb.png' height='30' />";
+            }
+            if (in_array('amex', $eway_payment_type)) {
+                $images[] = "<img src='catalog/view/theme/default/image/eway_creditcard_amex.png' height='30' />";
             }
             if (in_array('paypal', $eway_payment_type)) {
-                $images[] = "<img src='catalog/view/theme/default/image/eway_paypal.png' height='34' />";
+                $images[] = "<img src='catalog/view/theme/default/image/eway_paypal.png' height='30' />";
             }
             if (in_array('masterpass', $eway_payment_type)) {
-                $images[] = "<img src='catalog/view/theme/default/image/eway_masterpass.png' height='34' />";
+                $images[] = "<img src='catalog/view/theme/default/image/eway_masterpass.png' height='30' />";
             }
             if (in_array('vme', $eway_payment_type)) {
-                $images[] = "<img src='catalog/view/theme/default/image/eway_vme.png' height='34' />";
+                $images[] = "<img src='catalog/view/theme/default/image/eway_vme.png' height='30' />";
             }
 
             $method_data = array(

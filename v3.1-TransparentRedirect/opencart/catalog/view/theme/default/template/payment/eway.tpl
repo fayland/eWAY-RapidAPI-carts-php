@@ -18,6 +18,7 @@
     }
   }
     function IsCC_checked(v) {
+        if (! document.getElementById("creditcard_info")) return;
         if (v) {
             document.getElementById("creditcard_info").style.display = "block";
         } else {
@@ -34,27 +35,43 @@
   <?php } ?>
 
     <?php
-        if (count($payment_type) == 0) $payment_type = array('creditcard', 'paypal', 'masterpass', 'vme');
+        if (count($payment_type) == 0) $payment_type = array('visa', 'mastercard', 'jcb', 'diners', 'amex', 'paypal', 'masterpass', 'vme');
         if (count($payment_type) == 1) {
             echo "<input type='hidden' name='EWAY_PAYMENTTYPE' value='" . $payment_type . "' />";
         } else {
-            if (in_array('creditcard', $payment_type)) {
-                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:IsCC_checked(true)' /> <img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='34' /> <img src='catalog/view/theme/default/image/eway_creditcard_master.png' height='34' /></label> ";
+            if (in_array('visa', $payment_type) || in_array('mastercard', $payment_type) || in_array('diners', $payment_type) || in_array('jcb', $payment_type) || in_array('amex', $payment_type)) {
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:IsCC_checked(true)' /> ";
+                if (in_array('visa', $payment_type)) {
+                  echo "<img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='30' /> ";
+                }
+                if (in_array('mastercard', $payment_type)) {
+                  echo "<img src='catalog/view/theme/default/image/eway_creditcard_master.png' height='30' /> ";
+                }
+                if (in_array('diners', $payment_type)) {
+                  echo "<img src='catalog/view/theme/default/image/eway_creditcard_diners.png' height='30' /> ";
+                }
+                if (in_array('jcb', $payment_type)) {
+                  echo "<img src='catalog/view/theme/default/image/eway_creditcard_jcb.png' height='30' /> ";
+                }
+                if (in_array('amex', $payment_type)) {
+                  echo "<img src='catalog/view/theme/default/image/eway_creditcard_amex.png' height='30' /> ";
+                }
+                echo "</label> ";
             }
             if (in_array('paypal', $payment_type)) {
-                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='paypal' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_paypal.png' height='34' /></label> ";
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='paypal' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_paypal.png' height='30' /></label> ";
             }
             if (in_array('masterpass', $payment_type)) {
-                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='masterpass' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_masterpass.png' height='34' /></label> ";
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='masterpass' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_masterpass.png' height='30' /></label> ";
             }
             if (in_array('vme', $payment_type)) {
-                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='vme' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_vme.png' height='34' /></label> ";
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='vme' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_vme.png' height='30' /></label> ";
             }
         }
     ?>
 
 
-    <?php if (in_array('creditcard', $payment_type)) { ?>
+    <?php if (in_array('visa', $payment_type) || in_array('mastercard', $payment_type) || in_array('diners', $payment_type) || in_array('jcb', $payment_type) || in_array('amex', $payment_type)) { ?>
 <div class="content" id="creditcard_info">
 <font size="2pt"><strong>Credit Card Payment</strong></font>
 <table id="eway_table" cellspacing="0" cellpadding="3" border="0">
