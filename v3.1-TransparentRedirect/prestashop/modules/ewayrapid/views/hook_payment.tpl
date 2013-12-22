@@ -93,7 +93,7 @@ function IsCC_checked(v) {
 {/if}
 
     <p class="cart_navigation submit">
-        <input type="submit" name="processCarrier" value="{l s='Pay with Eway' mod='ewayrapidapi'} &raquo;" class="exclusive" />
+        <input type="submit" name="processPayment" value="{l s='Process Payment' mod='ewayrapidapi'} &raquo;" class="exclusive" />
     </p>
 
   </form>
