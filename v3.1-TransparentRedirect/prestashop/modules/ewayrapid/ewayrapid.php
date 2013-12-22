@@ -29,7 +29,7 @@ class Ewayrapid extends PaymentModule {
 			OR !Configuration::updateValue('EWAYRAPID_USERNAME', '')
 			OR !Configuration::updateValue('EWAYRAPID_PASSWORD', '')
 			OR !Configuration::updateValue('EWAYRAPID_SANDBOX', 1)
-			OR !Configuration::updateValue('EWAYRAPID_PAYMENTTYPE', '')
+			OR !Configuration::updateValue('EWAYRAPID_PAYMENTTYPE', 'visa, mastercard')
 			OR !$this->registerHook('payment')
             OR !$this->registerHook('paymentReturn'))
 			return false;
@@ -55,7 +55,7 @@ class Ewayrapid extends PaymentModule {
 		$data['sandbox'] = isset($_POST['sandbox']) ? $_POST['sandbox'] : isset($conf['EWAYRAPID_SANDBOX']) ? $conf['EWAYRAPID_SANDBOX'] : 0;
 		$data['username'] = isset($_POST['username']) ? $_POST['username'] : isset($conf['EWAYRAPID_USERNAME']) ? $conf['EWAYRAPID_USERNAME'] : '';
 		$data['password'] = isset($_POST['password']) ? $_POST['password'] : isset($conf['EWAYRAPID_PASSWORD']) ? $conf['EWAYRAPID_PASSWORD'] : '';
-		$data['paymenttype'] = isset($_POST['paymenttype']) ? $_POST['paymenttype'] : isset($conf['EWAYRAPID_PAYMENTTYPE']) ? $conf['EWAYRAPID_PAYMENTTYPE'] : '';
+		$data['paymenttype'] = isset($_POST['paymenttype']) ? $_POST['paymenttype'] : isset($conf['EWAYRAPID_PAYMENTTYPE']) ? explode(',', $conf['EWAYRAPID_PAYMENTTYPE']) : '';
 
 		$this->context->smarty->assign($data);
 		return $this->display(__FILE__, 'views/back_office.tpl');
@@ -72,7 +72,7 @@ class Ewayrapid extends PaymentModule {
 				Configuration::updateValue('EWAYRAPID_SANDBOX', (int) Tools::getValue('sandbox'));
 				Configuration::updateValue('EWAYRAPID_USERNAME', trim(Tools::getValue('username')));
 				Configuration::updateValue('EWAYRAPID_PASSWORD', trim(Tools::getValue('password')));
-				Configuration::updateValue('EWAYRAPID_PAYMENTTYPE', trim(Tools::getValue('paymenttype')));
+				Configuration::updateValue('EWAYRAPID_PAYMENTTYPE', implode(',', Tools::getValue('paymenttype')));
 
 				$this->context->smarty->assign('eWAY_save_success', true);
 			}
@@ -97,7 +97,8 @@ class Ewayrapid extends PaymentModule {
 		$__sandbox = Configuration::get('EWAYRAPID_SANDBOX');
 		$__username = Configuration::get('EWAYRAPID_USERNAME');
 		$__password = Configuration::get('EWAYRAPID_PASSWORD');
-		$__paymenttype = Configuration::get('EWAYRAPID_PAYMENTTYPE');
+		$__paymenttype = explode(',', Configuration::get('EWAYRAPID_PAYMENTTYPE'));
+        if (count($__paymenttype) == 0) $__paymenttype = array('visa', 'mastercard', 'jcb', 'diners', 'amex', 'paypal', 'masterpass', 'vme');
 
         // Create Responsive Shared Page Request Object
     	$request = new eWAY\CreateAccessCodesSharedRequest();

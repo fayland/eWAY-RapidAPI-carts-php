@@ -37,7 +37,7 @@
     <?php
         if (count($payment_type) == 0) $payment_type = array('visa', 'mastercard', 'jcb', 'diners', 'amex', 'paypal', 'masterpass', 'vme');
         if (count($payment_type) == 1) {
-            echo "<input type='hidden' name='EWAY_PAYMENTTYPE' value='" . $payment_type . "' />";
+            echo "<input type='hidden' name='EWAY_PAYMENTTYPE' value='" . $payment_type[0] . "' />";
         } else {
             if (in_array('visa', $payment_type) || in_array('mastercard', $payment_type) || in_array('diners', $payment_type) || in_array('jcb', $payment_type) || in_array('amex', $payment_type)) {
                 echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:IsCC_checked(true)' /> ";

@@ -51,13 +51,14 @@
 
 			<label>{l s='Payment Type' mod='ewayrapid'}</label>
 			<div class="margin-form">
-                <select name='paymenttype'>
-                	<option value='USER_PICK'>Let customer pick</option>
-                	<option value="creditcard"{if $paymenttype == 'creditcard'} selected="selected"{/if}>Credit Card</option>
-                	<option value='paypal'{if $paymenttype == 'paypal'} selected="selected"{/if}>Paypal</option>
-                	<option value='masterpass'{if $paymenttype == 'masterpass'} selected="selected"{/if}>MasterPass</option>
-                	<option value='vme'{if $paymenttype == 'vme'} selected="selected"{/if}>V.me By Visa</option>
-                </select>
+                <input type='checkbox' name='paymenttype[]' value='visa' {if in_array('visa', $paymenttype)} checked='checked'{/if} /> CC - Visa
+				<input type='checkbox' name='paymenttype[]' value='mastercard' {if in_array('mastercard', $paymenttype)} checked='checked'{/if} /> CC - MasterCard
+				<input type='checkbox' name='paymenttype[]' value='diners' {if in_array('diners', $paymenttype)} checked='checked'{/if} /> CC - Diners Clue
+				<input type='checkbox' name='paymenttype[]' value='jcb' {if in_array('jcb', $paymenttype)} checked='checked'{/if} /> CC - JCB
+				<input type='checkbox' name='paymenttype[]' value='amex' {if in_array('amex', $paymenttype)} checked='checked'{/if} /> CC - Amex
+				<input type='checkbox' name='paymenttype[]' value='paypal' {if in_array('paypal', $paymenttype)} checked='checked'{/if} /> PayPal
+				<input type='checkbox' name='paymenttype[]' value='masterpass' {if in_array('masterpass', $paymenttype)} checked='checked'{/if} /> MasterPass
+				<input type='checkbox' name='paymenttype[]' value='vme' {if in_array('vme', $paymenttype)} checked='checked'{/if}/> V.me By Visa
             </div>
 
 			<br />
