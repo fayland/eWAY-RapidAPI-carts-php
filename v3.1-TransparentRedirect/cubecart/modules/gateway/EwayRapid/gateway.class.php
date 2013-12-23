@@ -235,9 +235,19 @@ class Gateway {
         if (isset($lblError)) {
             $GLOBALS['smarty']->assign('error', $lblError);
         } else {
-            $GLOBALS['smarty']->assign('payment_type', $this->_module['eway_payment_type']);
+            $eway_payment_type = array();
+            if ($this->_module['eway_payment_type_visa']) $eway_payment_type[] = 'visa';
+            if ($this->_module['eway_payment_type_mastercard']) $eway_payment_type[] = 'mastercard';
+            if ($this->_module['eway_payment_type_diners']) $eway_payment_type[] = 'diners';
+            if ($this->_module['eway_payment_type_jcb']) $eway_payment_type[] = 'jcb';
+            if ($this->_module['eway_payment_type_amex']) $eway_payment_type[] = 'amex';
+            if ($this->_module['eway_payment_type_paypal']) $eway_payment_type[] = 'paypal';
+            if ($this->_module['eway_payment_type_masterpass']) $eway_payment_type[] = 'masterpass';
+            if ($this->_module['eway_payment_type_vme']) $eway_payment_type[] = 'vme';
+            $GLOBALS['smarty']->assign('payment_type', $eway_payment_type);
             $GLOBALS['smarty']->assign('AccessCode', $result->AccessCode);
             $GLOBALS['smarty']->assign('FormActionURL', $result->FormActionURL);
+            $GLOBALS['smarty']->assign('eWAY_images_url', $GLOBALS['storeURL'] . '/modules/gateway/EwayRapid/images');
         }
 
         ## Check for custom template for module in skin folder
