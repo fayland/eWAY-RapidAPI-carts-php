@@ -17,12 +17,19 @@
       return false;
     }
   }
-    function IsCC_checked(v) {
-        if (! document.getElementById("creditcard_info")) return;
-        if (v) {
+    function select_eWAYPaymentOption(v) {
+        if (document.getElementById("creditcard_info"))
+            document.getElementById("creditcard_info").style.display = "none";
+        if (document.getElementById("tip_paypal"))
+            document.getElementById("tip_paypal").style.display = "none";
+        if (document.getElementById("tip_masterpass"))
+            document.getElementById("tip_masterpass").style.display = "none";
+        if (document.getElementById("tip_vme"))
+            document.getElementById("tip_vme").style.display = "none";
+        if (v == 'creditcard') {
             document.getElementById("creditcard_info").style.display = "block";
         } else {
-            document.getElementById("creditcard_info").style.display = "none";
+            document.getElementById("tip_" + v).style.display = "block";
         }
     }
 //-->
@@ -34,13 +41,14 @@
   <div class="warning"><?php echo $text_testing; ?></div>
   <?php } ?>
 
+    <div style="margin-bottom: 10px;">
     <?php
         if (count($payment_type) == 0) $payment_type = array('visa', 'mastercard', 'jcb', 'diners', 'amex', 'paypal', 'masterpass', 'vme');
         if (count($payment_type) == 1) {
             echo "<input type='hidden' name='EWAY_PAYMENTTYPE' value='" . $payment_type[0] . "' />";
         } else {
             if (in_array('visa', $payment_type) || in_array('mastercard', $payment_type) || in_array('diners', $payment_type) || in_array('jcb', $payment_type) || in_array('amex', $payment_type)) {
-                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:IsCC_checked(true)' /> ";
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:select_eWAYPaymentOption(\"creditcard\")' /> ";
                 if (in_array('visa', $payment_type)) {
                   echo "<img src='catalog/view/theme/default/image/eway_creditcard_visa.png' height='30' /> ";
                 }
@@ -59,17 +67,30 @@
                 echo "</label> ";
             }
             if (in_array('paypal', $payment_type)) {
-                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='paypal' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_paypal.png' height='30' /></label> ";
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='paypal' onchange='javascript:select_eWAYPaymentOption(\"paypal\")' /> <img src='catalog/view/theme/default/image/eway_paypal.png' height='30' /></label> ";
             }
             if (in_array('masterpass', $payment_type)) {
-                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='masterpass' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_masterpass.png' height='30' /></label> ";
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='masterpass' onchange='javascript:select_eWAYPaymentOption(\"masterpass\")' /> <img src='catalog/view/theme/default/image/eway_masterpass.png' height='30' /></label> ";
             }
             if (in_array('vme', $payment_type)) {
-                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='vme' onchange='javascript:IsCC_checked(false)' /> <img src='catalog/view/theme/default/image/eway_vme.png' height='30' /></label> ";
+                echo "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='vme' onchange='javascript:select_eWAYPaymentOption(\"vme\")' /> <img src='catalog/view/theme/default/image/eway_vme.png' height='30' /></label> ";
             }
         }
     ?>
 
+    </div>
+
+    <?php
+        if (in_array('paypal', $payment_type)) {
+            echo '<p id="tip_paypal" style="display:none;">After you click "Confirm Order" Please note that you will be redirected to "PayPal" to complete your payment.</p>';
+        }
+        if (in_array('masterpass', $payment_type)) {
+            echo '<p id="tip_masterpass" style="display:none;">After you click "Confirm Order" Please note that you will be redirected to "MasterPass by MasterCard" to complete your payment.</p>';
+        }
+        if (in_array('vme', $payment_type)) {
+            echo '<p id="tip_vme" style="display:none;">After you click "Confirm Order" Please note that you will be redirected to "V.Me by Visa" to complete your payment.</p>';
+        }
+    ?>
 
     <?php if (in_array('visa', $payment_type) || in_array('mastercard', $payment_type) || in_array('diners', $payment_type) || in_array('jcb', $payment_type) || in_array('amex', $payment_type)) { ?>
 <div class="content" id="creditcard_info">
