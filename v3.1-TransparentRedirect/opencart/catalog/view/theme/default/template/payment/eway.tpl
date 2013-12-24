@@ -145,10 +145,10 @@
 </td></tr>
 
 </table>
+</div>
     <?php } ?>
 
 </form>
-</div>
 
 <div class="buttons">
     <div class="right"><a onclick="$('#payment').submit();" class="button"><span><?php echo $button_confirm; ?></span></a></div>

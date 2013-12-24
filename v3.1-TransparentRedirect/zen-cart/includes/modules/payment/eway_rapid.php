@@ -29,20 +29,34 @@ class eway_rapid extends base {
         }
 
         $eway_payment_type = MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE;
-        $title = MODULE_PAYMENT_EWAYRAPID_TEXT_PUBLIC_TITLE;
-        if ($eway_payment_type === 'vme') {
-            $title = "<img src='images/eway_vme.png' height='20' />";
-        } elseif ($eway_payment_type === 'masterpass') {
-            $title = "<img src='images/eway_masterpass.png' height='20' />";
-        } elseif ($eway_payment_type === 'paypal') {
-            $title = "<img src='images/eway_paypal.png' height='20' />";
-        } elseif ($eway_payment_type === 'creditcard') {
-            $title = "<img src='images/eway_creditcard_visa.png' height='20' /> <img src='images/eway_creditcard_master.png' height='20' />";
-        } else {
-            $title = "<img src='images/eway_creditcard_visa.png' height='20' /> <img src='images/eway_creditcard_master.png' height='20' /> <img src='images/eway_paypal.png' height='20' /> <img src='images/eway_masterpass.png' height='20' /> <img src='images/eway_vme.png' height='20' />";
+        if (! is_array($eway_payment_type)) $eway_payment_type = explode(', ', $eway_payment_type);
+        $images = array();
+        if (in_array('visa', $eway_payment_type)) {
+            $images[] = "<img src='images/eway_creditcard_visa.png' height='30' />";
+        }
+        if (in_array('mastercard', $eway_payment_type)) {
+            $images[] = "<img src='images/eway_creditcard_master.png' height='30' />";
+        }
+        if (in_array('diners', $eway_payment_type)) {
+            $images[] = "<img src='images/eway_creditcard_diners.png' height='30' />";
+        }
+        if (in_array('jcb', $eway_payment_type)) {
+            $images[] = "<img src='images/eway_creditcard_jcb.png' height='30' />";
+        }
+        if (in_array('amex', $eway_payment_type)) {
+            $images[] = "<img src='images/eway_creditcard_amex.png' height='30' />";
+        }
+        if (in_array('paypal', $eway_payment_type)) {
+            $images[] = "<img src='images/eway_paypal.png' height='30' />";
+        }
+        if (in_array('masterpass', $eway_payment_type)) {
+            $images[] = "<img src='images/eway_masterpass.png' height='30' />";
+        }
+        if (in_array('vme', $eway_payment_type)) {
+            $images[] = "<img src='images/eway_vme.png' height='30' />";
         }
 
-        $this->public_title = $title;
+        $this->public_title = implode(' ', $images);
         $this->description = MODULE_PAYMENT_EWAYRAPID_TEXT_DESCRIPTION;
         $this->sort_order = MODULE_PAYMENT_EWAYRAPID_SORT_ORDER;
         $this->enabled = ((MODULE_PAYMENT_EWAYRAPID_STATUS == 'True') ? true : false);
@@ -215,16 +229,78 @@ class eway_rapid extends base {
                   button.disabled = true;
                   return false;
                 }
+                function select_eWAYPaymentOption(v) {
+                    if (document.getElementById("creditcard_info"))
+                        document.getElementById("creditcard_info").style.display = "none";
+                    if (document.getElementById("tip_paypal"))
+                        document.getElementById("tip_paypal").style.display = "none";
+                    if (document.getElementById("tip_masterpass"))
+                        document.getElementById("tip_masterpass").style.display = "none";
+                    if (document.getElementById("tip_vme"))
+                        document.getElementById("tip_vme").style.display = "none";
+                    if (v == "creditcard") {
+                        document.getElementById("creditcard_info").style.display = "block";
+                    } else {
+                        document.getElementById("tip_" + v).style.display = "block";
+                    }
+                }
             </script>
             <form action="' . $result->FormActionURL . '" method="post" onsubmit="submiteWAYonce();">';
         $this->form_action_url = $result->FormActionURL;
         $process_button_string .= zen_draw_hidden_field('EWAY_ACCESSCODE', $result->AccessCode);
+        $process_button_string .= '<div style="margin-bottom: 10px;">';
 
         $payment_type = MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE;
-        if ($payment_type == 'paypal' || $payment_type == 'masterpass' || $payment_type == 'vme') {
+        if (! is_array($payment_type)) $payment_type = explode(', ', $payment_type);
+
+        if (count($payment_type) == 0) $payment_type = array('visa', 'mastercard', 'jcb', 'diners', 'amex', 'paypal', 'masterpass', 'vme');
+        if (count($payment_type) == 1) {
             $process_button_string .= zen_draw_hidden_field('EWAY_PAYMENTTYPE', $payment_type);
         } else {
-            $cc_string = '
+            if (in_array('visa', $payment_type) || in_array('mastercard', $payment_type) || in_array('diners', $payment_type) || in_array('jcb', $payment_type) || in_array('amex', $payment_type)) {
+                $process_button_string .= "<label><input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:select_eWAYPaymentOption(\"creditcard\")' /> ";
+                if (in_array('visa', $payment_type)) {
+                  $process_button_string .= "<img src='images/eway_creditcard_visa.png' height='30' /> ";
+                }
+                if (in_array('mastercard', $payment_type)) {
+                  $process_button_string .= "<img src='images/eway_creditcard_master.png' height='30' /> ";
+                }
+                if (in_array('diners', $payment_type)) {
+                  $process_button_string .= "<img src='images/eway_creditcard_diners.png' height='30' /> ";
+                }
+                if (in_array('jcb', $payment_type)) {
+                  $process_button_string .= "<img src='images/eway_creditcard_jcb.png' height='30' /> ";
+                }
+                if (in_array('amex', $payment_type)) {
+                  $process_button_string .= "<img src='images/eway_creditcard_amex.png' height='30' /> ";
+                }
+                $process_button_string .= "</label><br />";
+            }
+            if (in_array('paypal', $payment_type)) {
+                $process_button_string .= "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='paypal' onchange='javascript:select_eWAYPaymentOption(\"paypal\")' /> <img src='images/eway_paypal.png' height='30' /></label><br />";
+            }
+            if (in_array('masterpass', $payment_type)) {
+                $process_button_string .= "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='masterpass' onchange='javascript:select_eWAYPaymentOption(\"masterpass\")' /> <img src='images/eway_masterpass.png' height='30' /></label><br />";
+            }
+            if (in_array('vme', $payment_type)) {
+                $process_button_string .= "<label><input type='radio' name='EWAY_PAYMENTTYPE' value='vme' onchange='javascript:select_eWAYPaymentOption(\"vme\")' /> <img src='images/eway_vme.png' height='30' /></label> ";
+            }
+        }
+
+        $process_button_string .= '</div>';
+        if (in_array('paypal', $payment_type)) {
+            $process_button_string .= '<p id="tip_paypal" style="display:none;">After you click "Confirm Order" Please note that you will be redirected to "PayPal" to complete your payment.</p>';
+        }
+        if (in_array('masterpass', $payment_type)) {
+            $process_button_string .= '<p id="tip_masterpass" style="display:none;">After you click "Confirm Order" Please note that you will be redirected to "MasterPass by MasterCard" to complete your payment.</p>';
+        }
+        if (in_array('vme', $payment_type)) {
+            $process_button_string .= '<p id="tip_vme" style="display:none;">After you click "Confirm Order" Please note that you will be redirected to "V.Me by Visa" to complete your payment.</p>';
+        }
+
+        if (in_array('visa', $payment_type) || in_array('mastercard', $payment_type) || in_array('diners', $payment_type) || in_array('jcb', $payment_type) || in_array('amex', $payment_type)) {
+            $process_button_string .= '
+            <div class="content" id="creditcard_info">
             <label for="eway_rapid-cc-ownerf" class="inputLabelPayment">Cardholder Name:</label><input type="text" name="EWAY_CARDNAME" value="" id="eway_rapid-cc-ownerf" autocomplete="off" /><br class="clearBoth" />
             <label for="eway_rapid-cc-number" class="inputLabelPayment">Credit Card Number:</label><input type="text" name="EWAY_CARDNUMBER" id="eway_rapid-cc-number" autocomplete="off" /><br class="clearBoth" />
             <label for="eway_rapid-cc-expires-month" class="inputLabelPayment">Credit Card Expiry Date:</label>
@@ -254,33 +330,8 @@ class eway_rapid extends base {
             </select>
             <br class="clearBoth" />
             <label for="eway_rapid-cc-cvv" class="inputLabelPayment">CVV</label><input type="text" name="EWAY_CARDCVN" size="4" maxlength="4" id="eway_rapid-cc-cvv" autocomplete="off" /><br class="clearBoth" />
+            </div>
             ';
-            if ($payment_type == 'creditcard') {
-                $process_button_string .= $cc_string;
-            } else {
-                // USER_PICK
-                $process_button_string .= '
-                <label class="inputLabelPayment">Select Payment Option:</label>
-                <select name="EWAY_PAYMENTTYPE" onchange="javascript:ChoosePaymentOption(this.options[this.options.selectedIndex].value)">
-                  <option value="creditcard">Credit Card</option>
-                  <option value="paypal">PayPal</option>
-                  <option value="masterpass">MasterPass</option>
-                  <option value="vme">V.me By Visa</option>
-                </select>
-                <br class="clearBoth" />
-                <script>
-                function ChoosePaymentOption(v) {
-                    if (v != "creditcard") {
-                        document.getElementById("creditcard_info").style.display = "none";
-                    } else {
-                        document.getElementById("creditcard_info").style.display = "block";
-                    }
-                }
-                </script>
-                <div id="creditcard_info">
-                ' . $cc_string . '</div>';
-
-            }
         }
 
         return $process_button_string;
@@ -385,7 +436,8 @@ class eway_rapid extends base {
 
         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('eWay Password', 'MODULE_PAYMENT_EWAYRAPID_PASSWORD', '', 'Your eWAY password registered when you join eWAY.', '6', '0', now())");
 
-        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('eWAY Payment Type', 'MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE', 'USER_PICK', 'The type of payment you are processing (new). USER_PICK will show options to customer.', '6', '0', 'zen_cfg_select_option(array(\'USER_PICK\', \'creditcard\', \'paypal\', \'masterpass\', \'vme\'), ', now())");
+        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('eWAY Payment Type', 'MODULE_PAYMENT_EWAYRAPID_PAYMENTTYPE', 'USER_PICK', 'The type of payment you are processing (new). USER_PICK will show options to customer.', '6', '0', 'zen_cfg_select_multioption(array(\'visa\', \'mastercard\', \'jcb\', \'diners\', \'amex\', \'paypal\', \'masterpass\', \'vme\'), ', now())");
+
 
         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_EWAYRAPID_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value', '6', '0', 'zen_cfg_pull_down_order_statuses(', 'zen_get_order_status_name', now())");
 
