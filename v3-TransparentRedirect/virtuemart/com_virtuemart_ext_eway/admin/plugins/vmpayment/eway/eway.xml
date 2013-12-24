@@ -30,9 +30,9 @@
 	<param type="spacer" default="VMPAYMENT_EWAY_PARAMS" level="level1" />
 
     <param type="text" name="eway_username" size="120" label="VMPAYMENT_EWAY_USERNAME"
-             default="F9802C/maKsWkaL1EFctuc9Bjorom8QHeXuyGALZcH200obvvwRkeflj56E5lzJLupRiyi" description="VMPAYMENT_EWAY_USERNAME_DESC" />
+             default="" description="VMPAYMENT_EWAY_USERNAME_DESC" />
     <param type="text" name="eway_password" size="50" label="VMPAYMENT_EWAY_PASSWORD"
-             default="F@land1" description="VMPAYMENT_EWAY_PASSWORD_DESC" />
+             default="" description="VMPAYMENT_EWAY_PASSWORD_DESC" />
 
     <!-- BY DEFAULT EWAY currency= vendor currency -->
 	<param name="payment_currency" type="vmacceptedcurrency" default="" label="VMPAYMENT_EWAY_CURRENCY" description="VMPAYMENT_EWAY_CURRENCY_DESC" />
