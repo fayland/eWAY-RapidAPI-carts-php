@@ -43,12 +43,16 @@ function select_eWAYPaymentOption(v) {
 <form id="gateway-transfer" action="{$FormActionURL}" method="post" target="_self" onsubmit="return avoidDuplicationSubmit()">
 <input type="hidden" name="EWAY_ACCESSCODE" value="{$AccessCode}" />
 
-<div style="margin-bottom: 10px;">
+<table width="100%" cellpadding="3" cellspacing="10" border="0">
+  <tr>
+    <td width="140">&nbsp;</td>
+    <td>
     {if $payment_type|@count == 1}
     <input type='hidden' name='EWAY_PAYMENTTYPE' value='$payment_type[0]' />
     {else}
         {if (in_array('visa', $payment_type) || in_array('mastercard', $payment_type) || in_array('diners', $payment_type) || in_array('jcb', $payment_type) || in_array('amex', $payment_type))}
-            <label><input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:select_eWAYPaymentOption("creditcard")' />
+            <div style="margin-bottom: 8px"><label>
+            <input type='radio' name='EWAY_PAYMENTTYPE' id='eway_radio_cc' value='creditcard' checked='checked' onchange='javascript:select_eWAYPaymentOption("creditcard")' />
             {if (in_array('visa', $payment_type))}
             <img src='{$eWAY_images_url}/eway_creditcard_visa.png' height='30' />
             {/if}
@@ -64,20 +68,21 @@ function select_eWAYPaymentOption(v) {
             {if (in_array('amex', $payment_type))}
             <img src='{$eWAY_images_url}/eway_creditcard_amex.png' height='30' />
             {/if}
-            </label>
+            </label></div>
         {/if}
         {if in_array('paypal', $payment_type)}
-            <label><input type='radio' name='EWAY_PAYMENTTYPE' value='paypal' onchange='javascript:select_eWAYPaymentOption("paypal")' /> <img src='{$eWAY_images_url}/eway_paypal.png' height='30' /></label>
+            <div style="margin-bottom: 8px"><label style="margin-bottom: 10px"><input type='radio' name='EWAY_PAYMENTTYPE' value='paypal' onchange='javascript:select_eWAYPaymentOption("paypal")' /> <img src='{$eWAY_images_url}/eway_paypal.png' height='30' /></label></div>
         {/if}
         {if in_array('masterpass', $payment_type)}
-            <label><input type='radio' name='EWAY_PAYMENTTYPE' value='masterpass' onchange='javascript:select_eWAYPaymentOption("masterpass")' /> <img src='{$eWAY_images_url}/eway_masterpass.png' height='30' /></label>
+            <div style="margin-bottom: 8px"><label style="margin-bottom: 10px"><input type='radio' name='EWAY_PAYMENTTYPE' value='masterpass' onchange='javascript:select_eWAYPaymentOption("masterpass")' /> <img src='{$eWAY_images_url}/eway_masterpass.png' height='30' /></label></div>
         {/if}
         {if in_array('vme', $payment_type)}
-            <label><input type='radio' name='EWAY_PAYMENTTYPE' value='vme' onchange='javascript:select_eWAYPaymentOption("vme")' /> <img src='{$eWAY_images_url}/eway_vme.png' height='30' /></label>
+            <div style="margin-bottom: 8px"><label style="margin-bottom: 10px"><input type='radio' name='EWAY_PAYMENTTYPE' value='vme' onchange='javascript:select_eWAYPaymentOption("vme")' /> <img src='{$eWAY_images_url}/eway_vme.png' height='30' /></label></div>
         {/if}
     {/if}
-
-</div>
+    </td>
+  </tr>
+</table>
 
         {if in_array('paypal', $payment_type)}
             <p id="tip_paypal" style="display:none;">After you click "Make Payment" Please note that you will be redirected to "PayPal" to complete your payment.</p>
@@ -93,30 +98,30 @@ function select_eWAYPaymentOption(v) {
 <div id="creditcard_info">
 <table width="100%" cellpadding="3" cellspacing="10" border="0">
   <tr>
-	<td width="140">Card Holders Name</td>
-	<td><input type="text" name="EWAY_CARDNAME" /></td>
+  <td width="140">Card Holders Name</td>
+  <td><input type="text" name="EWAY_CARDNAME" /></td>
   </tr>
   <tr>
-	<td width="140">{$LANG.gateway.card_number}</td>
-	<td><input type="text" name="EWAY_CARDNUMBER" value="" size="18" maxlength="18" /></td>
+  <td width="140">{$LANG.gateway.card_number}</td>
+  <td><input type="text" name="EWAY_CARDNUMBER" value="" size="18" maxlength="18" /></td>
   </tr>
   <tr>
-	<td width="140">{$LANG.gateway.card_expiry_date}</td>
-	<td>
-	  <select name="EWAY_CARDEXPIRYMONTH">
-		{foreach from=$CARD.expire.months item=month}<option value="{$month.value}" {$month.selected}>{$month.display}</option>{/foreach}
-	  </select>
-	  /
-	  <select name="EWAY_CARDEXPIRYYEAR">
-		{foreach from=$CARD.expire.years item=year}<option value="{$year.value}" {$year.selected}>{$year.display}</option>{/foreach}
-	  </select>
-	</td>
+  <td width="140">{$LANG.gateway.card_expiry_date}</td>
+  <td>
+    <select name="EWAY_CARDEXPIRYMONTH">
+    {foreach from=$CARD.expire.months item=month}<option value="{$month.value}" {$month.selected}>{$month.display}</option>{/foreach}
+    </select>
+    /
+    <select name="EWAY_CARDEXPIRYYEAR">
+    {foreach from=$CARD.expire.years item=year}<option value="{$year.value}" {$year.selected}>{$year.display}</option>{/foreach}
+    </select>
+  </td>
   </tr>
   <tr>
-	<td width="140">CVN</td>
-	<td>
-	  <input type="text" name="EWAY_CARDCVN" value="" size="5" class="textbox_small" />
-	</td>
+  <td width="140">CVN</td>
+  <td>
+    <input type="text" name="EWAY_CARDCVN" value="" size="5" class="textbox_small" />
+  </td>
   </tr>
 </table>
 </div>
