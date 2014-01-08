@@ -45,7 +45,7 @@
 		<td><input type="text" class="text" name="EWAY_CARDCVN" id="EWAY_CARDCVN" /></td>
 	</tr>
 
-	<tr><td colspan='2'><input type='image' src="{$module_dir}eway.gif" alt="{l s='Pay with Eway' mod='ewayrapidapi'}" /></td></tr>
+	<tr><td colspan='2'><input type='image' src="{$module_dir}eway.gif" alt="{l s='Pay with Credit Card' mod='ewayrapidapi'}" /></td></tr>
   </table>
   </form>
 </p>

@@ -1,7 +1,7 @@
 <?php
 
   define('MODULE_PAYMENT_EWAYRAPID_TEXT_TITLE', 'eWAY Payments');
-  define('MODULE_PAYMENT_EWAYRAPID_TEXT_PUBLIC_TITLE', 'Pay with eWAY');
+  define('MODULE_PAYMENT_EWAYRAPID_TEXT_PUBLIC_TITLE', 'Pay with Credit Card');
   define('MODULE_PAYMENT_EWAYRAPID_TEXT_DESCRIPTION', 'Accepts payments with eWAY');
 
 
