@@ -4,7 +4,7 @@ include(dirname(__FILE__).'/../../config/config.inc.php');
 include(dirname(__FILE__).'/../../header.php');
 include(dirname(__FILE__).'/ewaysharedpage.php');
 
-if (!$cookie->isLogged())
+if (!$cookie->isLogged(true))
 	Tools::redirect('index.php?controller=authentication&back=order.php');
 
 $Ewayshared = new Ewaysharedpage();
