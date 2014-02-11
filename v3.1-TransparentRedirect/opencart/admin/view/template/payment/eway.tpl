@@ -72,7 +72,7 @@
           <td>
               <input type='checkbox' name='eway_payment_type[]' value='visa' <?php if (in_array('visa', $eway_payment_type)) { echo " checked='checked'"; } ?> /> CC - Visa
               <input type='checkbox' name='eway_payment_type[]' value='mastercard' <?php if (in_array('mastercard', $eway_payment_type)) { echo " checked='checked'"; } ?> /> CC - MasterCard
-              <input type='checkbox' name='eway_payment_type[]' value='diners' <?php if (in_array('diners', $eway_payment_type)) { echo " checked='checked'"; } ?> /> CC - Diners Clue
+              <input type='checkbox' name='eway_payment_type[]' value='diners' <?php if (in_array('diners', $eway_payment_type)) { echo " checked='checked'"; } ?> /> CC - Diners Club
               <input type='checkbox' name='eway_payment_type[]' value='jcb' <?php if (in_array('jcb', $eway_payment_type)) { echo " checked='checked'"; } ?> /> CC - JCB
               <input type='checkbox' name='eway_payment_type[]' value='amex' <?php if (in_array('amex', $eway_payment_type)) { echo " checked='checked'"; } ?> /> CC - Amex
               <input type='checkbox' name='eway_payment_type[]' value='paypal' <?php if (in_array('paypal', $eway_payment_type)) { echo " checked='checked'"; } ?> /> PayPal

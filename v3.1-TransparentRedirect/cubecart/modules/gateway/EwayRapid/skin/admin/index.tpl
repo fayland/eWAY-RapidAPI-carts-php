@@ -28,7 +28,7 @@
                 <span>
                     <input type='checkbox' name='module[eway_payment_type_visa]' value='1' {$CHECKED_eway_payment_type_visa_1} /> CC - Visa
                     <input type='checkbox' name='module[eway_payment_type_mastercard]' value='1' {$CHECKED_eway_payment_type_mastercard_1} /> CC - MasterCard
-                    <input type='checkbox' name='module[eway_payment_type_diners]' value='1' {$CHECKED_eway_payment_type_diners_1} /> CC - Diners Clue
+                    <input type='checkbox' name='module[eway_payment_type_diners]' value='1' {$CHECKED_eway_payment_type_diners_1} /> CC - Diners Club
                     <input type='checkbox' name='module[eway_payment_type_jcb]' value='1' {$CHECKED_eway_payment_type_jcb_1} /> CC - JCB
                     <input type='checkbox' name='module[eway_payment_type_amex]' value='1' {$CHECKED_eway_payment_type_amex_1} /> CC - Amex
                 </span>

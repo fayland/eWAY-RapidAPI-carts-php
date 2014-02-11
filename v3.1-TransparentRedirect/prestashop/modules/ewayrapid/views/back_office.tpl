@@ -53,7 +53,7 @@
 			<div class="margin-form">
                 <input type='checkbox' name='paymenttype[]' value='visa' {if in_array('visa', $paymenttype)} checked='checked'{/if} /> CC - Visa
 				<input type='checkbox' name='paymenttype[]' value='mastercard' {if in_array('mastercard', $paymenttype)} checked='checked'{/if} /> CC - MasterCard
-				<input type='checkbox' name='paymenttype[]' value='diners' {if in_array('diners', $paymenttype)} checked='checked'{/if} /> CC - Diners Clue
+				<input type='checkbox' name='paymenttype[]' value='diners' {if in_array('diners', $paymenttype)} checked='checked'{/if} /> CC - Diners Club
 				<input type='checkbox' name='paymenttype[]' value='jcb' {if in_array('jcb', $paymenttype)} checked='checked'{/if} /> CC - JCB
 				<input type='checkbox' name='paymenttype[]' value='amex' {if in_array('amex', $paymenttype)} checked='checked'{/if} /> CC - Amex
 				<input type='checkbox' name='paymenttype[]' value='paypal' {if in_array('paypal', $paymenttype)} checked='checked'{/if} /> PayPal
