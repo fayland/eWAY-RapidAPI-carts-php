@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <install version="1.5" type="plugin" group="vmpayment" >
     <name>VMPAYMENT_EWAY</name>
-    <creationDate>Dec 2011</creationDate>
+    <creationDate>Nov 2013</creationDate>
     <author>Fayland Lam</author>
-    <authorUrl>http://www.fayland.org/</authorUrl>
-    <copyright>Copyright (C) 2012 Fayland Lam All rights reserved.</copyright>
+    <authorUrl>http://www.fayland.me/</authorUrl>
+    <copyright>Copyright (C) 2013 Fayland Lam All rights reserved.</copyright>
     <license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
-    <version>2.0.8c</version>
-    <description><![CDATA[<a href="https://www.eway.com.au/" target="_blank">eWAY</a> is a popular
-	payment provider and available in many countries. ]]>
+    <version>2.0.9</version>
+    <description><![CDATA[<a href="https://www.eway.com.au/" target="_blank">eWAY</a> is a popular payment provider and available in many countries. ]]>
     </description>
 
     <files>
-	<filename plugin="eway">eway.php</filename>
+		<filename plugin="eway">eway.php</filename>
     </files>
     <languages>
 	<language tag="en-GB">en-GB.plg_vmpayment_eway.ini</language>
@@ -33,6 +32,14 @@
              default="" description="VMPAYMENT_EWAY_USERNAME_DESC" />
     <param type="text" name="eway_password" size="50" label="VMPAYMENT_EWAY_PASSWORD"
              default="" description="VMPAYMENT_EWAY_PASSWORD_DESC" />
+
+    <param name="eway_payment_type" type="radio" default="1" label="VMPAYMENT_EWAY_PAYMENTTYPE" description="VMPAYMENT_EWAY_PAYMENTTYPE_DESC" >
+	    <option value="USER_PICK">User Pick</option>
+	    <option value="creditcard">Credit Card</option>
+	    <option value="paypal">PayPal</option>
+	    <option value="masterpass">MasterPass</option>
+	    <option value="vme">V.me By Visa</option>
+	</param>
 
     <!-- BY DEFAULT EWAY currency= vendor currency -->
 	<param name="payment_currency" type="vmacceptedcurrency" default="" label="VMPAYMENT_EWAY_CURRENCY" description="VMPAYMENT_EWAY_CURRENCY_DESC" />

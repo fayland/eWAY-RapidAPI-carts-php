@@ -281,7 +281,7 @@ class plgVMPaymentEway extends vmPSPlugin {
             }
 
             $html .= '<table class="adminForm user-details"><tr><td class="key">';
-            $html .= "<input type='submit' value='Process with Eway' />";
+            $html .= "<input type='submit' value='Process Payment' />";
             $html .= '</td></tr></table></form>';
         }
 
