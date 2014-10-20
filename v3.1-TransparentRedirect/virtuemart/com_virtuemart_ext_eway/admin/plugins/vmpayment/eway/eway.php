@@ -116,7 +116,7 @@ class plgVMPaymentEway extends vmPSPlugin {
         $session = JFactory::getSession();
         $return_context = $session->getId();
 
-        $url = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=pluginresponse&pm=' . $order['details']['BT']->virtuemart_paymentmethod_id) . '&task=pluginresponsereceived';
+        $url = JROUTE::_(JURI::root() . 'index.php?option=com_virtuemart&view=pluginresponse&task=pluginresponsereceived&pm=' . $order['details']['BT']->virtuemart_paymentmethod_id . '&ItemId=' . vRequest::getInt('Itemid') . '&on=' . $order['details']['BT']->order_number);
 
         require_once(realpath(dirname(__FILE__).'/lib/eWAY/RapidAPI.php'));
 
